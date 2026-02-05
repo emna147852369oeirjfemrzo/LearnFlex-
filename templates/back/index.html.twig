@@ -5,6 +5,8 @@
 {% block stylesheets %}
 <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/crud.css') }}">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
@@ -42,12 +44,22 @@
                 <span>contenu pédagogique</span>
               </a>
             </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Evaluation</span>
-              </a>
-            </li>
+            <li class="has-submenu">
+    <a href="#">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Evaluation</span>
+        <i class="fas fa-chevron-down submenu-toggle"></i>
+    </a>
+    <ul class="submenu">
+        <li>
+            <a href="{{ path('admin_examen') }}">Examen</a>
+        </li>
+        <li>
+            <a href="{{ path('app_challenges') }}">Challenge</a>
+        </li>
+    </ul>
+</li>
+
             <li>
               <a href="#">
                 <i class="fas fa-question-circle"></i>
@@ -545,6 +557,16 @@ document.addEventListener('DOMContentLoaded', function() {
             mainContent.classList.toggle('expanded');
         });
     }
+// Submenu toggle
+const submenuToggles = document.querySelectorAll('.has-submenu > a');
+
+submenuToggles.forEach(toggle => {
+    toggle.addEventListener('click', function(e) {
+        e.preventDefault(); // empêcher le # de faire remonter en haut
+        const parent = this.parentElement;
+        parent.classList.toggle('open'); // ajoute/enlève la classe open
+    });
+});
 
     // Report Tabs
     const reportTabs = document.querySelectorAll('.report-tab');

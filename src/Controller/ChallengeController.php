@@ -120,4 +120,49 @@ public function addChallenge(Request $request, ManagerRegistry $doctrine): Respo
     ]);
 }
 
+
+#[Route('/admin/challenges', name: 'app_challenges')]
+public function triechallenge(
+    Request $request,
+    ChallengeRepository $challengeRepository
+): Response {
+
+    $etat = $request->query->get('etat', 'all');
+    $q = $request->query->get('q');
+
+    if ($q) {
+        // recherche + filtre état (optionnel)
+        $challenges = $challengeRepository->searchByEtat($q, $etat);
+    } else {
+        // filtre état simple
+        $challenges = $challengeRepository->findByEtat($etat);
+    }
+
+    return $this->render('challenge/index.html.twig', [
+        'challenges' => $challenges,
+        'etat_selectionne' => $etat,
+    ]);
+}
+
+#[Route('/admin/challenge/pdf/{id}', name: 'app_challenge_pdf')]
+public function pdfchallenge(Challenge $challenge): Response
+{
+    $html = $this->renderView('challenge/pdf.html.twig', [
+        'challenge' => $challenge
+    ]);
+
+    $dompdf = new \Dompdf\Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $pdfContent = $dompdf->output();
+
+    return new Response($pdfContent, 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="Challenge_'.$challenge->getTitrec().'.pdf"'
+    ]);
+}
+
+
 }

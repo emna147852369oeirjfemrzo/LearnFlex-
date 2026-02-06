@@ -56,16 +56,24 @@ public function findByEtat(?string $etat): array
     $qb = $this->createQueryBuilder('c');
 
     if ($etat && $etat !== 'all') {
-        $qb->where('c.etat = :etat')
+        $qb->andWhere('c.etat = :etat')
            ->setParameter('etat', $etat);
     }
 
     return $qb
-        ->orderBy('c.datecreationn', 'DESC')
+        ->orderBy(
+            "CASE 
+                WHEN c.etat = 'actif' THEN 1
+                WHEN c.etat = 'planifié' THEN 2
+                WHEN c.etat = 'terminé' THEN 3
+                WHEN c.etat = 'annulé' THEN 4
+                ELSE 5
+            END",
+            'ASC'
+        )
+        ->addOrderBy('c.datelimite', 'ASC')
         ->getQuery()
         ->getResult();
 }
-
-
 
 }

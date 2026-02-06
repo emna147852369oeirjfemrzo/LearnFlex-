@@ -122,15 +122,37 @@
             </div>
         </header>
 
-        <div class="dashboard-content">
-            <div class="crud-container">
-                <div class="crud-header">
-                    <div class="tabs">
-                        <button class="tab-btn active" data-tab="all">Tous</button>
-                        <button class="tab-btn" data-tab="actif">Actifs</button>
-                        <button class="tab-btn" data-tab="termine">Terminés</button>
-                    </div>
-                </div>
+        <div class="crud-container">
+    <div class="crud-header">
+        <div class="tabs" style="justify-content: center;">
+
+            <a href="{{ path('app_challenges') }}"
+               class="tab-btn {% if etat_selectionne|default('all') == 'all' %}active{% endif %}">
+                Tous
+            </a>
+
+            <a href="{{ path('app_challenges', { etat: 'planifié' }) }}"
+               class="tab-btn {% if etat_selectionne|default(null) == 'planifié' %}active{% endif %}">
+                Planifiés
+            </a>
+
+            <a href="{{ path('app_challenges', { etat: 'actif' }) }}"
+               class="tab-btn {% if etat_selectionne|default(null) == 'actif' %}active{% endif %}">
+                Actifs
+            </a>
+
+            <a href="{{ path('app_challenges', { etat: 'terminé' }) }}"
+               class="tab-btn {% if etat_selectionne|default(null) == 'terminé' %}active{% endif %}">
+                Terminés
+            </a>
+
+            <a href="{{ path('app_challenges', { etat: 'annulé' }) }}"
+               class="tab-btn {% if etat_selectionne|default(null) == 'annulé' %}active{% endif %}">
+                Annulés
+            </a>
+
+        </div>
+    </div>
 
                 <div class="view-container table-view active">
                     <div class="buses-table-container">
@@ -183,7 +205,13 @@
     <button class="action-btn delete" title="Supprimer">
         <i class="fas fa-trash"></i>
     </button>
+    
 </form>
+<a href="{{ path('app_challenge_pdf', {'id': challenge.id}) }}"
+       class="action-btn pdf"
+       title="Télécharger PDF">
+        <i class="fas fa-file-pdf"></i>
+    </a>
 
                                         </td>
                                     </tr>

@@ -1,0 +1,35 @@
+{% extends 'front/home.html.twig' %}
+
+{% block title %}Evaluation - LearnFlex+{% endblock %}
+
+{% block body %}
+<main class="evaluation-page">
+    <div class="container">
+        <h1>Evaluation</h1>
+
+        <div class="challenges-list">
+            {% for challenge in challenges %}
+                <div class="challenge-card">
+                    <h2>{{ challenge.titrec }}</h2>
+                    <p>{{ challenge.descriptionc }}</p>
+
+                    <p>Objectif : {{ challenge.objectifscore }}%</p>
+                    <p>Progression : {{ challenge.progressionactuelle }}%</p>
+                    <p>Niveau atteint : {{ challenge.niveauatteint }}</p>
+                    <p>Récompense : {{ challenge.typerecomponse }}</p>
+
+                    <a href="#" class="btn btn-primary">
+                        Commencer le challenge
+                    </a>
+
+                    <a href="#" class="btn btn-outline">
+                        Télécharger PDF
+                    </a>
+                </div>
+            {% else %}
+                <p>Aucun challenge disponible pour le moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+{% endblock %}

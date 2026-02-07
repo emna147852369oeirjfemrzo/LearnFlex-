@@ -10,6 +10,7 @@
 ###< symfony/framework-bundle ###
 
 ###> symfony/asset-mapper ###
-/public/assets/
+/public/assets/build/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+

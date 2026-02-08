@@ -1,3 +1,4 @@
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Ajouter un Examen{% endblock %}
@@ -81,9 +82,18 @@
 
                 <div class="crud-body">
                     {{ form_start(form, {'attr': {'class': 'crud-form'}}) }}
+                    {% if form.vars.submitted and not form.vars.valid %}
+                    <div class="alert alert-danger" role="alert" style="margin-bottom: 1rem; padding: 1rem; border: 1px solid #dc3545; background: #f8d7da; color: #721c24; border-radius: 4px;">
+                        <strong>Erreurs de saisie :</strong> Veuillez corriger les champs signalés en rouge ci-dessous.
+                    </div>
+                    {% endif %}
+                    {{ form_errors(form) }}
 
                     <div class="form-grid">
                         {{ form_row(form.titre) }}
+
+{{ form_row(form.description) }}
+
                         {{ form_row(form.matiere) }}
                         {{ form_row(form.niveauexamen) }}
                         {{ form_row(form.typeexamen) }}
@@ -96,7 +106,8 @@
                         {{ form_row(form.scoretotal) }}
                         {{ form_row(form.coefficient) }}
                         {{ form_row(form.etat) }}
-                        {{ form_row(form.description) }}
+                        {{ form_row(form.datecreation) }}
+                        {{ form_row(form.pdfFile) }}
                     </div>
 
                     <div class="form-actions">

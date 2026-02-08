@@ -67,6 +67,11 @@ class Examen
     #[ORM\OneToMany(targetEntity: Challenge::class, mappedBy: 'examen')]
     private Collection $challenges;
 
+    #[ORM\Column(length: 255)]
+    private ?string $pdf = null;
+
+  
+
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
@@ -293,4 +298,18 @@ class Examen
 
         return $this;
     }
+
+    public function getPdf(): ?string
+    {
+        return $this->pdf;
+    }
+
+    public function setPdf(string $pdf): static
+    {
+        $this->pdf = $pdf;
+
+        return $this;
+    }
+
+   
 }

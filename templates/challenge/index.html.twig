@@ -10,88 +10,48 @@
 {% block body %}
 <div class="dashboard">
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">
-          <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="nav-logo">
-          <span>LearnFlex</span><span class="highlight">+</span>
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="nav-logo">
+                <span>LearnFlex</span><span class="highlight">+</span>
+            </div>
+            <button class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        <button class="sidebar-toggle">
-          <i class="fas fa-bars"></i>
-        </button>
-      </div>
-      
-      <div class="sidebar-content">
-        <nav class="sidebar-menu">
-          <ul>
-            <li class="active">
-              <a href="#">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-users"></i>
-                <span>Utilisateurs</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-book-open"></i>
-                <span>contenu pédagogique</span>
-              </a>
-            </li>
-            <li class="has-submenu">
-    <a href="#">
-        <i class="fas fa-graduation-cap"></i>
-        <span>Evaluation</span>
-        <i class="fas fa-chevron-down submenu-toggle"></i>
-    </a>
-    <ul class="submenu">
-        <li>
-            <a href="{{ path('admin_examen') }}">Examen</a>
-        </li>
-        <li>
-            <a href="#">Challenge</a>
-        </li>
-    </ul>
-</li>
 
-            <li>
-              <a href="#">
-                <i class="fas fa-question-circle"></i>
-                <span>Questionnaire</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-directions"></i>
-                <span>Orientation</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-comments"></i>
-                <span>Forum</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-      
-      <div class="sidebar-footer">
-        <a href="#" class="user-profile">
-          <img src="{{ asset('assets/images/placeholder-admin.png') }}" alt="Admin" class="user-img">
-          <div class="user-info">
-            <h4>Admin User</h4>
-            <p>Administrateur</p>
-          </div>
-        </a>
-        <a href="#" class="logout">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Déconnexion</span>
-        </a>
-      </div>
+        <div class="sidebar-content">
+            <nav class="sidebar-menu">
+                <ul>
+                    <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li><a href="#"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+                    <li><a href="#"><i class="fas fa-book-open"></i><span>Contenu pédagogique</span></a></li>
+                    <li class="has-submenu">
+                        <a href="#"><i class="fas fa-graduation-cap"></i><span>Evaluation</span><i class="fas fa-chevron-down submenu-toggle"></i></a>
+                        <ul class="submenu">
+                            <li><a href="{{ path('admin_examen') }}">Examen</a></li>
+                            <li><a href="#">Challenge</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#"><i class="fas fa-question-circle"></i><span>Questionnaire</span></a></li>
+                    <li><a href="#"><i class="fas fa-directions"></i><span>Orientation</span></a></li>
+                    <li><a href="#"><i class="fas fa-comments"></i><span>Forum</span></a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="#" class="user-profile">
+                <img src="{{ asset('assets/images/placeholder-admin.png') }}" alt="Admin" class="user-img">
+                <div class="user-info">
+                    <h4>Admin User</h4>
+                    <p>Administrateur</p>
+                </div>
+            </a>
+            <a href="#" class="logout">
+                <i class="fas fa-sign-out-alt"></i><span>Déconnexion</span>
+            </a>
+        </div>
     </aside>
 
     <main class="main-content">
@@ -102,127 +62,89 @@
             </div>
             <div class="header-right">
                 <form method="get" action="{{ path('admin_challenge_index') }}" class="search-bar">
-        <input
-            type="text"
-            name="q"
-            placeholder="Rechercher un challenge"
-            value="{{ app.request.get('q') }}"
-            aria-label="Rechercher un challenge"
-        >
-        <button type="submit">
-            <i class="fas fa-search"></i>
-        </button>
-    </form>
+                    <input type="text" name="q" placeholder="Rechercher un challenge" value="{{ app.request.get('q') }}" aria-label="Rechercher un challenge">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
                 <div class="actions">
-<a href="{{ path('app_addformchallenge') }}" class="btn primary">
-    <i class="fas fa-plus"></i> Ajouter un Challenge
-</a>
-
-
+                    <a href="{{ path('app_addformchallenge') }}" class="btn primary"><i class="fas fa-plus"></i> Ajouter un Challenge</a>
+                </div>
             </div>
         </header>
 
         <div class="crud-container">
-    <div class="crud-header">
-        <div class="tabs" style="justify-content: center;">
+            <div class="crud-header">
+                <div class="tabs" style="justify-content: center;">
+                    <a href="{{ path('app_challenges') }}" class="tab-btn {% if etat_selectionne|default('all') == 'all' %}active{% endif %}">Tous</a>
+                    <a href="{{ path('app_challenges', { etat: 'planifié' }) }}" class="tab-btn {% if etat_selectionne|default(null) == 'planifié' %}active{% endif %}">Planifiés</a>
+                    <a href="{{ path('app_challenges', { etat: 'actif' }) }}" class="tab-btn {% if etat_selectionne|default(null) == 'actif' %}active{% endif %}">Actifs</a>
+                    <a href="{{ path('app_challenges', { etat: 'terminé' }) }}" class="tab-btn {% if etat_selectionne|default(null) == 'terminé' %}active{% endif %}">Terminés</a>
+                    <a href="{{ path('app_challenges', { etat: 'annulé' }) }}" class="tab-btn {% if etat_selectionne|default(null) == 'annulé' %}active{% endif %}">Annulés</a>
+                </div>
+            </div>
 
-            <a href="{{ path('app_challenges') }}"
-               class="tab-btn {% if etat_selectionne|default('all') == 'all' %}active{% endif %}">
-                Tous
-            </a>
-
-            <a href="{{ path('app_challenges', { etat: 'planifié' }) }}"
-               class="tab-btn {% if etat_selectionne|default(null) == 'planifié' %}active{% endif %}">
-                Planifiés
-            </a>
-
-            <a href="{{ path('app_challenges', { etat: 'actif' }) }}"
-               class="tab-btn {% if etat_selectionne|default(null) == 'actif' %}active{% endif %}">
-                Actifs
-            </a>
-
-            <a href="{{ path('app_challenges', { etat: 'terminé' }) }}"
-               class="tab-btn {% if etat_selectionne|default(null) == 'terminé' %}active{% endif %}">
-                Terminés
-            </a>
-
-            <a href="{{ path('app_challenges', { etat: 'annulé' }) }}"
-               class="tab-btn {% if etat_selectionne|default(null) == 'annulé' %}active{% endif %}">
-                Annulés
-            </a>
-
-        </div>
-    </div>
-
-                <div class="view-container table-view active">
-                    <div class="buses-table-container">
-                        <table class="buses-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Titre</th>
-                                    <th>Description</th>
-                                    <th>Examen associé</th>
-                                    <th>Objectif</th>
-                                    <th>Progression</th>
-                                    <th>Niveau</th>
-                                    <th>Récompense</th>
-                                    <th>État</th>
-                                    <th>Date début</th>
-                                    <th>Date fin</th>
-                                    <th>Date limite</th>
-                                    <th>Alerte</th>
-                                    <th>Actions</th>
+            <div class="view-container table-view active">
+                <div class="buses-table-container">
+                    <table class="buses-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Titre</th>
+                                <th>Description</th>
+                                <th>Examen associé</th>
+                                <th>Objectif</th>
+                                <th>Question</th>
+                                <th>Progression</th>
+                                <th>Niveau</th>
+                                <th>Récompense</th>
+                                <th>État</th>
+                                <th>Date début</th>
+                                <th>Date fin</th>
+                                <th>Date limite</th>
+                                <th>Alerte</th>
+                                <th>Actions</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for challenge in challenges %}
+                                <tr data-statut="{{ challenge.etat|lower }}">
+                                    <td>{{ challenge.id }}</td>
+                                    <td>{{ challenge.titrec }}</td>
+                                    <td>{{ challenge.descriptionc }}</td>
+                                    <td>{{ challenge.examen.titre }}</td>
+                                    <td>{{ challenge.objectifscore }}</td>
+                                    <td>{{ challenge.question }}</td>
+                                    <td>{{ challenge.progressionactuelle }}</td>
+                                    <td>{{ challenge.niveauatteint }}</td>
+                                    <td>{{ challenge.typerecomponse }}<br>{{ challenge.contenurecompense }}</td>
+                                    <td><span class="status {{ challenge.etat|lower }}">{{ challenge.etat }}</span></td>
+                                    <td>{{ challenge.dated ? challenge.dated|date('d/m/Y') : '-' }}</td>
+                                    <td>{{ challenge.datef ? challenge.datef|date('d/m/Y') : '-' }}</td>
+                                    <td>{{ challenge.datelimite ? challenge.datelimite|date('d/m/Y') : '-' }}</td>
+                                    <td>{{ challenge.alerte ? 'Oui' : 'Non' }}</td>
+                                    <td class="actions">
+                                        <a href="{{ path('app_edit_challenge', {'id': challenge.id}) }}" class="action-btn edit" title="Modifier"><i class="fas fa-edit"></i></a>
+                                        <form method="post" action="{{ path('app_delete_challenge', {'id': challenge.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce challenge ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ challenge.id) }}">
+                                            <button class="action-btn delete" title="Supprimer"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                        <a href="{{ path('app_challenge_pdf', {'id': challenge.id}) }}" class="action-btn pdf" title="Télécharger PDF"><i class="fas fa-file-pdf"></i></a>
+                                    </td>
+                                    <td>
+                                        {% if challenge.images %}
+                                            <img src="{{ asset('uploads/photos/' ~ challenge.images) }}" alt="Photo du challenge" style="max-width:200px;">
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for challenge in challenges %}
-                                    <tr data-statut="{{ challenge.etat|lower }}">
-                                        <td>{{ challenge.id }}</td>
-                                        <td>{{ challenge.titrec }}</td>
-                                        <td>{{ challenge.descriptionc }}</td>
-                                        <td>{{ challenge.examen.titre }}</td>
-                                        <td>{{ challenge.objectifscore }}</td>
-                                        <td>{{ challenge.progressionactuelle }}</td>
-                                        <td>{{ challenge.niveauatteint }}</td>
-                                        <td>{{ challenge.typerecomponse }}<br>{{ challenge.contenurecompense }}</td>
-                                        <td><span class="status {{ challenge.etat|lower }}">{{ challenge.etat }}</span></td>
-                                        <td>{{ challenge.dated ? challenge.dated|date('d/m/Y') : '-' }}</td>
-                                        <td>{{ challenge.datef ? challenge.datef|date('d/m/Y') : '-' }}</td>
-                                        <td>{{ challenge.datelimite ? challenge.datelimite|date('d/m/Y') : '-' }}</td>
-                                        <td>{{ challenge.alerte ? 'Oui' : 'Non' }}</td>
-                                        <td class="actions">
-                                            <a href="#" class="action-btn view" title="Voir">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ path('app_edit_challenge', {'id': challenge.id}) }}" class="action-btn edit" title="Modifier">
-    <i class="fas fa-edit"></i>
-</a>
-
-                                           <form method="post" action="{{ path('app_delete_challenge', {'id': challenge.id}) }}" style="display:inline;" 
-      onsubmit="return confirm('Voulez-vous vraiment supprimer ce challenge ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ challenge.id) }}">
-    <button class="action-btn delete" title="Supprimer">
-        <i class="fas fa-trash"></i>
-    </button>
-    
-</form>
-<a href="{{ path('app_challenge_pdf', {'id': challenge.id}) }}"
-       class="action-btn pdf"
-       title="Télécharger PDF">
-        <i class="fas fa-file-pdf"></i>
-    </a>
-
-                                        </td>
-                                    </tr>
-                                {% else %}
-                                    <tr>
-                                        <td colspan="14" class="text-center">Aucun challenge trouvé</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            {% else %}
+                                <tr>
+                                    <td colspan="16" class="text-center">Aucun challenge trouvé</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

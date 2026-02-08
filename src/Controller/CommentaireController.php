@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CommentaireRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Form\ExamenType;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 final class CommentaireController extends AbstractController
@@ -104,21 +104,80 @@ public function deleteCommentaire(
     ManagerRegistry $m
 ): Response
 {
-    $em = $m->getManager();                 // Récupère l'EntityManager
-    $commentaire = $commentaireRepo->find($id); // Cherche le commentaire
+    $em = $m->getManager();                 
+    $commentaire = $commentaireRepo->find($id); 
 
     if (!$commentaire) {
         throw $this->createNotFoundException("Commentaire introuvable pour l'id $id");
     }
 
-    // Pour revenir à la page des commentaires du bon examen
     $examenId = $commentaire->getExamen()->getId();
 
-    $em->remove($commentaire);  // Supprime l'entité
-    $em->flush();               // Applique la suppression
+    $em->remove($commentaire);  
+    $em->flush();               
 
     return $this->redirectToRoute('app_examen_commentaires', [
         'id' => $examenId
     ]);
 }
+#[Route('/commentaire/add', name: 'commentaire_add', methods: ['POST'])]
+public function add(Request $request, EntityManagerInterface $em): JsonResponse
+{
+    $user = $this->getUser();
+    $content = $request->request->get('comment');
+    $examenId = $request->request->get('examenId');
+
+    if (!$content || !$examenId) {
+        return $this->json(['success' => false, 'message' => 'Données manquantes'], 400);
+    }
+
+    $examen = $em->getRepository(Examen::class)->find($examenId);
+    if (!$examen) {
+        return $this->json(['success' => false, 'message' => 'Examen introuvable'], 404);
+    }
+
+    $comment = new Commentaire();
+    $comment->setExamen($examen);
+    $comment->setAuteur($user ? $user->getUsername() : 'Anonyme');
+    $comment->setContenu($content);
+    $comment->setDatecre(new \DateTime());
+    $comment->setNbvue(0);
+    $comment->setLikes(0);
+
+    $em->persist($comment);
+    $em->flush();
+
+    return $this->json([
+        'success' => true,
+        'id' => $comment->getId(),
+        'auteur' => $comment->getAuteur(),
+        'contenu' => $comment->getContenu(),
+        'date' => $comment->getDatecre()->format('d/m/Y'),
+        'likes' => $comment->getLikes(),
+        'nbvue' => $comment->getNbvue()
+    ]);
+}
+
+  #[Route('/commentaire/like/{id}', name: 'commentaire_like', methods: ['POST'])]
+    public function like(
+        Commentaire $commentaire,
+        EntityManagerInterface $em
+    ): JsonResponse
+    {
+        $commentaire->setLikes($commentaire->getLikes() + 1);
+        $em->flush();
+
+        return new JsonResponse([
+            'likes' => $commentaire->getLikes()
+        ]);
+    }
+    #[Route('/commentaire/view/{id}', name: 'commentaire_view', methods: ['POST'])]
+public function incrementView(Commentaire $commentaire, EntityManagerInterface $em): JsonResponse
+{
+    $commentaire->setNbvue($commentaire->getNbvue() + 1);
+    $em->flush();
+
+    return $this->json(['success' => true, 'nbvue' => $commentaire->getNbvue()]);
+}
+
 }

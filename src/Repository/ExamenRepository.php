@@ -40,15 +40,28 @@ class ExamenRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    public function searchByKeyword(string $keyword)
+   public function searchByKeyword(string $keyword)
 {
+    // On transforme le mot-clé en minuscule pour ignorer la casse
+    $keyword = strtolower($keyword);
+
     return $this->createQueryBuilder('e')
-        ->where('e.titre LIKE :kw')
-        ->orWhere('e.description LIKE :kw')
-        ->orWhere('e.matiere LIKE :kw')
+        ->where('LOWER(e.titre) LIKE :kw')
+        ->orWhere('LOWER(e.description) LIKE :kw')
+        ->orWhere('LOWER(e.matiere) LIKE :kw')
         ->setParameter('kw', '%'.$keyword.'%')
+        ->orderBy('e.titre', 'ASC') // tri optionnel
         ->getQuery()
         ->getResult();
+}
+
+public function getExamenParNiveau(string $niveau): ?Examen
+{
+    return $this->createQueryBuilder('e')
+        ->andWhere('e.niveau = :niveau')
+        ->setParameter('niveau', $niveau)
+        ->getQuery()
+        ->getOneOrNullResult();
 }
 
 }

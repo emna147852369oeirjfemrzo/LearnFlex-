@@ -1,3 +1,4 @@
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Ajouter un Examen{% endblock %}
@@ -24,7 +25,7 @@
         <nav class="sidebar-menu">
             <ul>
                 <li>
-                    <a href="#">
+                    <a href="{{path('app_back')}}">
                         <i class="fas fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                     </a>
@@ -84,6 +85,9 @@
 
                     <div class="form-grid">
                         {{ form_row(form.titre) }}
+
+{{ form_row(form.description) }}
+
                         {{ form_row(form.matiere) }}
                         {{ form_row(form.niveauexamen) }}
                         {{ form_row(form.typeexamen) }}
@@ -96,7 +100,6 @@
                         {{ form_row(form.scoretotal) }}
                         {{ form_row(form.coefficient) }}
                         {{ form_row(form.etat) }}
-                        {{ form_row(form.description) }}
                     </div>
 
                     <div class="form-actions">

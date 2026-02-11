@@ -10,6 +10,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Challenge;
 use App\Form\ChallengeType;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 
 class ChallengeController extends AbstractController
 {
@@ -38,6 +40,21 @@ public function addChallenge(Request $request, ManagerRegistry $doctrine): Respo
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+                $photoFile = $form->get('images')->getData();
+        if ($photoFile) {
+            $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $newFilename = $originalFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
+            try {
+                $photoFile->move(
+                    $this->getParameter('challenges_photos_directory'),
+                    $newFilename
+                );
+                $challenge->setImages($newFilename);
+            } catch (FileException $e) {
+                // Gérer l'erreur de téléchargement
+                $this->addFlash('error', 'Erreur lors du téléchargement de la photo');
+            }
+        }
         $em->persist($challenge);
         $em->flush();
 
@@ -163,6 +180,30 @@ public function pdfchallenge(Challenge $challenge): Response
         'Content-Disposition' => 'attachment; filename="Challenge_'.$challenge->getTitrec().'.pdf"'
     ]);
 }
+ #[Route('/challenge/{id}/update-score', name: 'challenge_update_score', methods: ['POST'])]
+public function updateScore(Challenge $challenge, Request $request, ManagerRegistry $doctrine): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
 
+    if (!$data) {
+        return new JsonResponse(['status' => 'error', 'message' => 'Données invalides'], 400);
+    }
 
+    $score = $data['score'] ?? null;
+    $niveau = $data['niveau'] ?? null;
+    $reponses = $data['reponses'] ?? [];
+
+    if ($score === null || $niveau === null) {
+        return new JsonResponse(['status' => 'error', 'message' => 'Score ou niveau manquant'], 400);
+    }
+
+    $challenge->setProgressionactuelle($score);
+    $challenge->setNiveauatteint($niveau);
+
+    $em = $doctrine->getManager();
+    $em->persist($challenge);
+    $em->flush();
+
+    return new JsonResponse(['status' => 'success']);
+}
 }

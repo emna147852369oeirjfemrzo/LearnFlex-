@@ -64,32 +64,7 @@
             </div>
         </header>
 
-        {# ===== FORMULAIRE AJOUT COMMENTAIRE ===== #}
-        <div class="dashboard-content">
-            <div class="crud-container">
-                <div class="crud-header">
-<h2>
-    {{ isEdit ? 'Modifier le commentaire' : 'Ajouter un commentaire' }}
-</h2>
-                </div>
-                <div class="crud-body">
-                    {{ form_start(formCommentaire, {'attr': {'class': 'crud-form'}}) }}
-                        <div class="form-grid">
-                            {{ form_row(formCommentaire.contenu) }}
-                            {{ form_row(formCommentaire.auteur) }}
-                        </div>
-                        <div class="form-actions">
-                          <button class="btn primary">
-    <i class="fas {{ isEdit ? 'fa-save' : 'fa-plus' }}"></i>
-    {{ isEdit ? 'Modifier' : 'Ajouter' }}
-</button>
-
-                        </div>
-                    {{ form_end(formCommentaire) }}
-                </div>
-            </div>
-        </div>
-
+    
         {# ===== TABLE DES COMMENTAIRES EXISTANTS ===== #}
         <div class="dashboard-content">
             <div class="crud-container">
@@ -123,7 +98,6 @@
                                 <th>Auteur</th>
                                 <th>Nombre de vues</th>
                                 <th>Likes</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,22 +109,7 @@
                                     <td>{{ commentaire.auteur }}</td>
                                     <td>{{ commentaire.nbvue }}</td>
                                     <td>{{ commentaire.likes }}</td>
-                                    <td class="actions">
-                                       <a href="{{ path('app_examen_commentaires', {
-                                            id: examen.id,
-                                            commentaireId: commentaire.id
-                                        }) }}"
-                                        class="action-btn edit"
-                                        title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ path('app_commentaire_delete', {id: commentaire.id}) }}"
-                                            class="action-btn delete"
-                                            onclick="return confirm('Voulez-vous vraiment supprimer ce commentaire ?');"
-                                            title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                            </a>
-                     </td>
+                                  
                                 </tr>
                             {% else %}
                                 <tr>

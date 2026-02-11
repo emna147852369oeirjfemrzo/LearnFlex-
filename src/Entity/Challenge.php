@@ -6,6 +6,7 @@ use App\Repository\ChallengeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: ChallengeRepository::class)]
 class Challenge
 {
@@ -26,6 +27,7 @@ class Challenge
     #[ORM\Column]
     private ?float $progressionactuelle = null;
 
+    
     #[ORM\Column(length: 50)]
     private ?string $niveaudifficulte = null;
 
@@ -60,6 +62,12 @@ class Challenge
     #[ORM\JoinColumn(nullable: false)]
     private ?Examen $examen = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $question = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $images = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -70,11 +78,11 @@ class Challenge
         return $this->titrec;
     }
  public function __construct()
-    {
-        $this->alerte = false;
-        $this->progressionactuelle = 0;
-        $this->datecreationn = new \DateTime();
-    }
+                      {
+                          $this->alerte = false;
+                          $this->progressionactuelle = 0;
+                          $this->datecreationn = new \DateTime();
+                      }
     public function setTitrec(string $titrec): static
     {
         $this->titrec = $titrec;
@@ -246,6 +254,30 @@ class Challenge
     public function setExamen(?Examen $examen): static
     {
         $this->examen = $examen;
+
+        return $this;
+    }
+
+    public function getQuestion(): ?string
+    {
+        return $this->question;
+    }
+
+    public function setQuestion(string $question): static
+    {
+        $this->question = $question;
+
+        return $this;
+    }
+
+    public function getImages(): ?string
+    {
+        return $this->images;
+    }
+
+    public function setImages(string $images): static
+    {
+        $this->images = $images;
 
         return $this;
     }

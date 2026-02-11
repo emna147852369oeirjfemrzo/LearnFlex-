@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CommentaireRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Form\ExamenType;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 final class CommentaireController extends AbstractController
@@ -26,44 +26,18 @@ final class CommentaireController extends AbstractController
             'controller_name' => 'CommentaireController',
         ]);
     }
-   #[Route('/examen/{id}/commentaires/{commentaireId?}', name: 'app_examen_commentaires')]
+#[Route('/examen/{id}/commentaires', name: 'app_examen_commentaires')]
 public function affichercommentaire(
     int $id,
-    ?int $commentaireId,
     Request $request,
     ExamenRepository $examenRepo,
     CommentaireRepository $commentaireRepo,
-    EntityManagerInterface $em
 ): Response {
 
     $examen = $examenRepo->find($id);
     if (!$examen) {
         throw $this->createNotFoundException('Examen introuvable');
     }
-
-    // 🔹 Gestion du formulaire commentaire
-    if ($commentaireId) {
-        $commentaire = $commentaireRepo->find($commentaireId);
-        if (!$commentaire) {
-            throw $this->createNotFoundException('Commentaire introuvable');
-        }
-    } else {
-        $commentaire = new Commentaire();
-        $commentaire->setExamen($examen);
-        $commentaire->setDatecre(new \DateTime());
-    }
-
-    $form = $this->createForm(CommentaireType::class, $commentaire);
-    $form->handleRequest($request);
-    if ($form->isSubmitted() && $form->isValid()) {
-        $em->persist($commentaire);
-        $em->flush();
-
-        return $this->redirectToRoute('app_examen_commentaires', [
-            'id' => $examen->getId()
-        ]);
-    }
-
     // 🔹 Filtrage par auteur et date
     $professeur = $request->query->get('auteur'); // filtrer par professeur
     $date = $request->query->get('date');         // filtrer par date
@@ -90,35 +64,101 @@ public function affichercommentaire(
     return $this->render('commentaire/index.html.twig', [
         'examen' => $examen,
         'commentaires' => $commentairesFiltres,
-        'formCommentaire' => $form->createView(),
-        'isEdit' => $commentaireId !== null,
         'auteur_selectionne' => $professeur,
         'date_selectionnee' => $date
     ]);
 }
-
-#[Route('/commentaire/delete/{id}', name: 'app_commentaire_delete')]
-public function deleteCommentaire(
-    $id,
-    CommentaireRepository $commentaireRepo,
-    ManagerRegistry $m
-): Response
+#[Route('/commentaire/add', name: 'commentaire_add', methods: ['POST'])]
+public function add(Request $request, EntityManagerInterface $em): JsonResponse
 {
-    $em = $m->getManager();                 // Récupère l'EntityManager
-    $commentaire = $commentaireRepo->find($id); // Cherche le commentaire
+    $user = $this->getUser();
+    $content = $request->request->get('comment');
+    $examenId = $request->request->get('examenId');
 
-    if (!$commentaire) {
-        throw $this->createNotFoundException("Commentaire introuvable pour l'id $id");
+    if (!$content || !$examenId) {
+        return $this->json(['success' => false, 'message' => 'Données manquantes'], 400);
     }
 
-    // Pour revenir à la page des commentaires du bon examen
-    $examenId = $commentaire->getExamen()->getId();
+    $examen = $em->getRepository(Examen::class)->find($examenId);
+    if (!$examen) {
+        return $this->json(['success' => false, 'message' => 'Examen introuvable'], 404);
+    }
 
-    $em->remove($commentaire);  // Supprime l'entité
-    $em->flush();               // Applique la suppression
+    $comment = new Commentaire();
+    $comment->setExamen($examen);
+    $comment->setAuteur($user ? $user->getUsername() : 'Anonyme');
+    $comment->setContenu($content);
+    $comment->setDatecre(new \DateTime());
+    $comment->setNbvue(0);
+    $comment->setLikes(0);
 
-    return $this->redirectToRoute('app_examen_commentaires', [
-        'id' => $examenId
+    $em->persist($comment);
+    $em->flush();
+
+    return $this->json([
+        'success' => true,
+        'id' => $comment->getId(),
+        'auteur' => $comment->getAuteur(),
+        'contenu' => $comment->getContenu(),
+        'date' => $comment->getDatecre()->format('d/m/Y'),
+        'likes' => $comment->getLikes(),
+        'nbvue' => $comment->getNbvue()
     ]);
 }
+
+  #[Route('/commentaire/like/{id}', name: 'commentaire_like', methods: ['POST'])]
+    public function like(
+        Commentaire $commentaire,
+        EntityManagerInterface $em
+    ): JsonResponse
+    {
+        $commentaire->setLikes($commentaire->getLikes() + 1);
+        $em->flush();
+
+        return new JsonResponse([
+            'likes' => $commentaire->getLikes()
+        ]);
+    }
+    #[Route('/commentaire/view/{id}', name: 'commentaire_view', methods: ['POST'])]
+public function incrementView(Commentaire $commentaire, EntityManagerInterface $em): JsonResponse
+{
+    $commentaire->setNbvue($commentaire->getNbvue() + 1);
+    $em->flush();
+
+    return $this->json(['success' => true, 'nbvue' => $commentaire->getNbvue()]);
+}
+#[Route('/commentaire/edit/{id}', name: 'commentaire_edit', methods: ['POST'])]
+public function editCommentaire(
+    int $id,
+    Request $request,
+    CommentaireRepository $commentaireRepo,
+    ManagerRegistry $doctrine
+): JsonResponse {
+    $comment = $commentaireRepo->find($id);
+
+    if (!$comment) {
+        return $this->json(['success' => false, 'message' => 'Commentaire introuvable']);
+    }
+
+    $contenu = $request->request->get('contenu');
+
+    if (!$contenu) {
+        return $this->json(['success' => false, 'message' => 'Le contenu est vide']);
+    }
+
+    $comment->setContenu($contenu);
+    $doctrine->getManager()->flush();
+
+    return $this->json(['success' => true]);
+}
+#[Route('/commentaire/delete/{id}', name: 'commentaire_delete', methods: ['POST'])]
+public function deleteCommentaire(Request $request, Commentaire $commentaire, EntityManagerInterface $em): JsonResponse
+{
+    $em->remove($commentaire);
+    $em->flush();
+
+    return $this->json(['success' => true]);
+}
+
+
 }

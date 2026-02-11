@@ -14,6 +14,10 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 class ChallengeType extends AbstractType
 {
@@ -27,6 +31,7 @@ class ChallengeType extends AbstractType
                 'html5' => true,
                 'scale' => 2,
             ])
+             ->add('question', TextareaType::class)
             ->add('niveaudifficulte', ChoiceType::class, [
                 'choices' => [
                     'Facile' => 'facile',
@@ -46,20 +51,39 @@ class ChallengeType extends AbstractType
                     'Annulé' => 'annule',
                 ],
             ])
-            ->add('dated', DateType::class, [
-                'widget' => 'single_text',
-                'input' => 'datetime', // très important
-                'html5' => true,
-            ])
+           ->add('dated', DateType::class, [
+    'widget' => 'single_text',
+    'input' => 'datetime',
+    'html5' => true,
+    'required' => true, // <-- rend le champ obligatoire
+])
+->add('images', FileType::class, [
+        'label' => 'Photo du challenge',
+        'mapped' => false, // Important : ne mappe pas directement à l'entité
+        'required' => false,
+        'constraints' => [
+            new File([
+                'maxSize' => '5M',
+                'mimeTypes' => [
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                ],
+                'mimeTypesMessage' => 'Veuillez uploader une image valide (jpeg, png, gif)',
+            ]),
+        ],
+    ])
             ->add('datef', DateType::class, [
                 'widget' => 'single_text',
                 'input' => 'datetime',
                 'html5' => true,
+                'required' => true,
             ])
             ->add('datelimite', DateType::class, [
                 'widget' => 'single_text',
                 'input' => 'datetime',
                 'html5' => true,
+                'required' => true,
             ])
             ->add('alerte', CheckboxType::class, [
                 'required' => false,

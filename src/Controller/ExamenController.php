@@ -17,7 +17,9 @@ use App\Entity\Commentaire;
 use App\Form\CommentaireType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\CommentaireRepository;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Repository\ReponseExamenRepository;
 
 
 
@@ -261,4 +263,36 @@ public function downloadExam(string $filename)
 
         return new JsonResponse(['status' => 'success', 'likes' => $comment->getLikes()]);
     }
+#[Route('/examen/{id}/reponses', name: 'examen_reponses', methods: ['GET'])]
+public function reponses(int $id, ReponseExamenRepository $repo): JsonResponse
+{
+    // Récupérer toutes les réponses triées par date décroissante
+    $reponses = $repo->findBy(['examen' => $id], ['dateSoumission' => 'DESC']);
+
+    $lastByEtudiant = [];
+
+    foreach ($reponses as $r) {
+        $etudiantId = $r->getEtudiant()?->getId() ?? 0;
+
+        // ne garder que le dernier essai par étudiant
+        if (!isset($lastByEtudiant[$etudiantId])) {
+            $lastByEtudiant[$etudiantId] = [
+                'etudiant' => $r->getEtudiant()?->getNom() ?? 'Anonyme',
+                'date' => $r->getDateSoumission()?->format('d/m/Y H:i') ?? '',
+                'reponses' => []
+            ];
+        }
+
+        // ajouter les réponses du dernier essai
+        if (!str_starts_with($r->getQuestion(), '_token')) { // ignorer _token
+            $lastByEtudiant[$etudiantId]['reponses'][$r->getQuestion()] = $r->getReponse();
+        }
+    }
+
+    // transformer en tableau simple pour JSON
+    $data = array_values($lastByEtudiant);
+
+    return $this->json($data);
+}
+
 }

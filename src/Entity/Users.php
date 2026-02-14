@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UsersRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -92,6 +94,17 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "datetime", nullable: true, name: "updated_at")]
     private ?\DateTimeInterface $updatedAt = null;
 
+    /**
+     * @var Collection<int, ReponseExamen>
+     */
+    #[ORM\OneToMany(targetEntity: ReponseExamen::class, mappedBy: 'etudiant')]
+    private Collection $reponseExamens;
+
+    public function __construct()
+    {
+        $this->reponseExamens = new ArrayCollection();
+    }
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -153,4 +166,34 @@ public function getRoles(): array
 
     public function getUpdatedAt(): ?\DateTimeInterface { return $this->updatedAt; }
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self { $this->updatedAt = $updatedAt; return $this; }
+
+    /**
+     * @return Collection<int, ReponseExamen>
+     */
+    public function getReponseExamens(): Collection
+    {
+        return $this->reponseExamens;
+    }
+
+    public function addReponseExamen(ReponseExamen $reponseExamen): static
+    {
+        if (!$this->reponseExamens->contains($reponseExamen)) {
+            $this->reponseExamens->add($reponseExamen);
+            $reponseExamen->setEtudiant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseExamen(ReponseExamen $reponseExamen): static
+    {
+        if ($this->reponseExamens->removeElement($reponseExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($reponseExamen->getEtudiant() === $this) {
+                $reponseExamen->setEtudiant(null);
+            }
+        }
+
+        return $this;
+    }
 }

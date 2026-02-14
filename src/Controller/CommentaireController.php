@@ -26,18 +26,44 @@ final class CommentaireController extends AbstractController
             'controller_name' => 'CommentaireController',
         ]);
     }
-#[Route('/examen/{id}/commentaires', name: 'app_examen_commentaires')]
+   #[Route('/examen/{id}/commentaires/{commentaireId?}', name: 'app_examen_commentaires')]
 public function affichercommentaire(
     int $id,
+    ?int $commentaireId,
     Request $request,
     ExamenRepository $examenRepo,
     CommentaireRepository $commentaireRepo,
+    EntityManagerInterface $em
 ): Response {
 
     $examen = $examenRepo->find($id);
     if (!$examen) {
         throw $this->createNotFoundException('Examen introuvable');
     }
+
+    // 🔹 Gestion du formulaire commentaire
+    if ($commentaireId) {
+        $commentaire = $commentaireRepo->find($commentaireId);
+        if (!$commentaire) {
+            throw $this->createNotFoundException('Commentaire introuvable');
+        }
+    } else {
+        $commentaire = new Commentaire();
+        $commentaire->setExamen($examen);
+        $commentaire->setDatecre(new \DateTime());
+    }
+
+    $form = $this->createForm(CommentaireType::class, $commentaire);
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->persist($commentaire);
+        $em->flush();
+
+        return $this->redirectToRoute('app_examen_commentaires', [
+            'id' => $examen->getId()
+        ]);
+    }
+
     // 🔹 Filtrage par auteur et date
     $professeur = $request->query->get('auteur'); // filtrer par professeur
     $date = $request->query->get('date');         // filtrer par date
@@ -64,13 +90,42 @@ public function affichercommentaire(
     return $this->render('commentaire/index.html.twig', [
         'examen' => $examen,
         'commentaires' => $commentairesFiltres,
+        'formCommentaire' => $form->createView(),
+        'isEdit' => $commentaireId !== null,
         'auteur_selectionne' => $professeur,
         'date_selectionnee' => $date
+    ]);
+}
+
+#[Route('/commentaire/delete/{id}', name: 'app_commentaire_delete')]
+public function deleteCommentaire(
+    $id,
+    CommentaireRepository $commentaireRepo,
+    ManagerRegistry $m
+): Response
+{
+    $em = $m->getManager();                 
+    $commentaire = $commentaireRepo->find($id); 
+
+    if (!$commentaire) {
+        throw $this->createNotFoundException("Commentaire introuvable pour l'id $id");
+    }
+
+    $examenId = $commentaire->getExamen()->getId();
+
+    $em->remove($commentaire);  
+    $em->flush();               
+
+    return $this->redirectToRoute('app_examen_commentaires', [
+        'id' => $examenId
     ]);
 }
 #[Route('/commentaire/add', name: 'commentaire_add', methods: ['POST'])]
 public function add(Request $request, EntityManagerInterface $em): JsonResponse
 {
+    // 🔹 Plus de restriction de rôle
+    // $this->denyAccessUnlessGranted('ROLE_USER'); // supprimé
+
     $user = $this->getUser();
     $content = $request->request->get('comment');
     $examenId = $request->request->get('examenId');
@@ -86,7 +141,11 @@ public function add(Request $request, EntityManagerInterface $em): JsonResponse
 
     $comment = new Commentaire();
     $comment->setExamen($examen);
-    $comment->setAuteur($user ? $user->getUsername() : 'Anonyme');
+
+    // 🔹 Auteur simplifié
+    $auteur = $user ? ($user->getPrenom() . ' ' . $user->getNom()) : 'Anonyme';
+    $comment->setAuteur($auteur);
+
     $comment->setContenu($content);
     $comment->setDatecre(new \DateTime());
     $comment->setNbvue(0);
@@ -127,36 +186,21 @@ public function incrementView(Commentaire $commentaire, EntityManagerInterface $
 
     return $this->json(['success' => true, 'nbvue' => $commentaire->getNbvue()]);
 }
-#[Route('/commentaire/edit/{id}', name: 'commentaire_edit', methods: ['POST'])]
-public function editCommentaire(
-    int $id,
-    Request $request,
-    CommentaireRepository $commentaireRepo,
-    ManagerRegistry $doctrine
-): JsonResponse {
-    $comment = $commentaireRepo->find($id);
-
-    if (!$comment) {
-        return $this->json(['success' => false, 'message' => 'Commentaire introuvable']);
-    }
-
-    $contenu = $request->request->get('contenu');
-
-    if (!$contenu) {
-        return $this->json(['success' => false, 'message' => 'Le contenu est vide']);
-    }
-
-    $comment->setContenu($contenu);
-    $doctrine->getManager()->flush();
-
+#[Route('/commentaire/{id}/delete', name: 'commentaire_delete', methods:['POST'])]
+public function delete(Commentaire $comment, ManagerRegistry $doctrine): JsonResponse
+{
+    $em = $doctrine->getManager();
+    $em->remove($comment);
+    $em->flush();
     return $this->json(['success' => true]);
 }
-#[Route('/commentaire/delete/{id}', name: 'commentaire_delete', methods: ['POST'])]
-public function deleteCommentaire(Request $request, Commentaire $commentaire, EntityManagerInterface $em): JsonResponse
+#[Route('/commentaire/{id}/edit', name: 'commentaire_edit', methods:['POST'])]
+public function edit(Commentaire $comment, Request $request, ManagerRegistry $doctrine): JsonResponse
 {
-    $em->remove($commentaire);
-    $em->flush();
-
+    $contenu = $request->request->get('contenu');
+    if (!$contenu) return $this->json(['success' => false, 'message' => 'Contenu vide']);
+    $comment->setContenu($contenu);
+    $doctrine->getManager()->flush();
     return $this->json(['success' => true]);
 }
 

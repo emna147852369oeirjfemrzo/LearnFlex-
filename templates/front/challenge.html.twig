@@ -23,7 +23,7 @@
             </ul>
         </nav>
         <div class="header-right">
-            {% if app.user and app.user.type != 'client' %}
+{% if app.user and app.user.role != 'client' %}
                 <a href="#" class="btn btn-outline dashboard-btn">Dashboard</a>
             {% endif %}
             {% if app.user %}

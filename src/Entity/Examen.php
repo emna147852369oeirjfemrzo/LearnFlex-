@@ -70,12 +70,22 @@ class Examen
     #[ORM\Column(length: 255)]
     private ?string $pdf = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $questions = null;
+
+    /**
+     * @var Collection<int, ReponseExamen>
+     */
+    #[ORM\OneToMany(targetEntity: ReponseExamen::class, mappedBy: 'examen')]
+    private Collection $reponseExamens;
+
   
 
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
         $this->challenges = new ArrayCollection();
+        $this->reponseExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -307,6 +317,48 @@ class Examen
     public function setPdf(string $pdf): static
     {
         $this->pdf = $pdf;
+
+        return $this;
+    }
+
+    public function getQuestions(): ?string
+    {
+        return $this->questions;
+    }
+
+    public function setQuestions(string $questions): static
+    {
+        $this->questions = $questions;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ReponseExamen>
+     */
+    public function getReponseExamens(): Collection
+    {
+        return $this->reponseExamens;
+    }
+
+    public function addReponseExamen(ReponseExamen $reponseExamen): static
+    {
+        if (!$this->reponseExamens->contains($reponseExamen)) {
+            $this->reponseExamens->add($reponseExamen);
+            $reponseExamen->setExamen($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseExamen(ReponseExamen $reponseExamen): static
+    {
+        if ($this->reponseExamens->removeElement($reponseExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($reponseExamen->getExamen() === $this) {
+                $reponseExamen->setExamen(null);
+            }
+        }
 
         return $this;
     }

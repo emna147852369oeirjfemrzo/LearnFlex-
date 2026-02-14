@@ -1,3 +1,4 @@
+
 {% extends 'front/home.html.twig' %}
 
 {% block title %}{{ examen.titre }} | LearnFlex+{% endblock %}
@@ -7,31 +8,44 @@
     <div class="container">
         <div class="header-left">
             <div class="logo">
-                <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflexplus Logo" class="main-logo">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-                <span class="logo-text">LearnFlex +</span>
+                {# Logo clickable for Admin and Enseignant only #}
+                {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                    <a href="{{ path('dashboard') }}">
+                        <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                        <span class="logo-text">LearnFlexPlus</span>
+                    </a>
+                {% else %}
+                    <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                    <span class="logo-text">LearnFlexPlus</span>
+                {% endif %}
             </div>
         </div>
         <nav class="main-nav">
             <ul>
-                <li class="active"><a href="#">Accueil</a></li>
+                <li class="active"><a href="{{ path('app_front') }}">Accueil</a></li>
                 <li><a href="#">Contenus pédagogiques</a></li>
-                <li><a href="{{ path('front_evaluation') }}">Evaluation</a></li>
+                <li><a href="{{path('front_evaluation')}}">Evaluation</a></li>
                 <li><a href="#">Questionnaire</a></li>
                 <li><a href="#">Orientation</a></li>
-                <li><a href="#">Forum</a></li>
+                <li><a href="#">Forum </a></li>
             </ul>
         </nav>
-        <div class="header-right">
-            {% if app.user and app.user.type != 'client' %}
-                <a href="#" class="btn btn-outline dashboard-btn">Dashboard</a>
+        
+       <div class="header-right">
+            {# Dashboard button now optional, you can even remove it if logo is enough #}
+            {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                <a href="{{ path('dashboard') }}" class="btn btn-outline dashboard-btn">Dashboard</a>
             {% endif %}
+
+            {# Logout for logged-in users #}
             {% if app.user %}
-                <a href="#" class="btn btn-primary logout-btn">Déconnexion</a>
+                <form action="{{ path('app_logout') }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-primary logout-btn">Déconnexion</button>
+                </form>
             {% else %}
-                <a href="#" class="btn btn-primary">Connexion</a>
+                <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
             {% endif %}
+
             <button class="mobile-menu-btn">
                 <i class="fas fa-bars"></i>
             </button>
@@ -73,6 +87,8 @@
         </div>
     </section>
 
+
+
     <!-- ===== EXAM CONTENT ===== -->
     <section class="exam-content">
         <div class="container grid">
@@ -100,68 +116,104 @@
     <span id="timer">00:00</span>
 </div>
 
+
                 <!-- FORMULAIRE QUESTIONS -->
               <form id="examForm" style="margin-top:30px; display:none;">
-    <h2>Répondez aux questions</h2>
-    {% for i in 1..examen.nbquestion %}
-        <div class="question-card">
+    <input type="hidden" name="_token" value="bc057383e6b9262.DtOkZKmoZhRJgCBhWq59M7DdqHtCoYuzVvxJmSv4yS8.S_7BCe3vK1Ez0RcOMvEqSeWJ7DYulLzyILkxzUOas0NZu9I-y_8CZXzwaQ">
+            <div class="question-card">
             <div class="question-header">
-                <span>Question {{ i }}</span>
+                <span>Question 1</span>
             </div>
             <div class="question-body">
-                <input type="text" name="q{{ i }}" id="q{{ i }}" placeholder="Écrivez votre réponse ici..." required>
+                <input type="text" name="q1" id="q1" placeholder="Écrivez votre réponse ici..." required>
             </div>
         </div>
-    {% endfor %}
-    <button type="submit" class="btn submit-btn">Soumettre</button>
-</form>
-
-
-                <!-- COMMENTAIRES -->
-                <div id="examComments" style="display:none; margin-top:30px;">
-                    <h2>Commentaires</h2>
-                    <div id="commentList">
-{% if commentaires is not empty %}
-{% for comment in commentaires %}
-                                <div class="comment-block">
-                                    <div class="comment-header">
-                                        <strong>{{ comment.auteur }}</strong>
-                                        <span class="comment-date">{{ comment.datecre|date('d/m/Y') }}</span>
-                                    </div>
-                                    <p>{{ comment.contenu }}</p>
-                           <div class="comment-meta">
-    <span class="views"><i class="fas fa-eye"></i> Vues : {{ comment.nbvue }}</span> |
-    <span class="likes"><i class="fas fa-thumbs-up"></i> Likes : {{ comment.likes }}</span>
-    <button class="like-btn btn btn-outline btn-sm" data-id="{{ comment.id }}">
-        <i class="fas fa-thumbs-up"></i> Like
-    </button>
-    <button class="edit-btn btn btn-outline btn-sm" data-id="{{ comment.id }}">✏️ Modifier</button>
-    <button class="delete-btn btn btn-outline btn-sm" data-id="{{ comment.id }}">🗑️ Supprimer</button>
+            <div class="question-card">
+            <div class="question-header">
+                <span>Question 2</span>
+            </div>
+            <div class="question-body">
+                <input type="text" name="q2" id="q2" placeholder="Écrivez votre réponse ici..." required>
+            </div>
+        </div>
+            <div class="question-card">
+            <div class="question-header">
+                <span>Question 3</span>
+            </div>
+            <div class="question-body">
+                <input type="text" name="q3" id="q3" placeholder="Écrivez votre réponse ici..." required>
+            </div>
+        </div>
+            <div class="question-card">
+            <div class="question-header">
+                <span>Question 4</span>
+            </div>
+            <div class="question-body">
+                <input type="text" name="q4" id="q4" placeholder="Écrivez votre réponse ici..." required>
+            </div>
+        </div>
+            <div class="question-card">
+            <div class="question-header">
+                <span>Question 5</span>
+            </div>
+            <div class="question-body">
+                <input type="text" name="q5" id="q5" placeholder="Écrivez votre réponse ici..." required>
+            </div>
+        </div>
+    <button type="button" id="submitExamBtn" class="btn btn-success" style="display:none;">Soumettre l’examen</button>
+<!-- Bloc pour commentaires enseignants -->
+<div id="teacherComments" style="display:none; margin-top:20px;">
+    <h3>Commentaires de l'enseignant</h3>
+    <div id="teacherCommentList"></div>
 </div>
 
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p>Aucun commentaire pour cet examen.</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- FORMULAIRE AJOUTER COMMENTAIRE -->
-                   <form id="addCommentForm" style="margin-top:20px;">
-    <h3>Ajouter un commentaire</h3>
-    <textarea name="comment" id="comment" placeholder="Écrire votre commentaire..." maxlength="500" required></textarea>
-    <small id="charCount" style="display:block; text-align:right; color:#555;">500 caractères restants</small>
-    <button type="submit" class="btn" disabled>Envoyer</button>
 </form>
 
-                </div>
+
 
             </div>
 
             <!-- ACTIONS (à droite) -->
             <aside class="exam-actions">
-                <h3>Accès à l’examen</h3>
-                <button id="startExamBtn" class="btn btn-block">▶ Commencer l’examen</button>
+                {% if is_granted('ROLE_ETUDIANT') %}
+                    <button id="startExamBtn" class="btn btn-block">▶ Commencer l’examen</button>
+                {% elseif is_granted('ROLE_ENSEIGNANT') %}
+                    <button id="accessResponsesBtn" class="btn btn-block">Voir les réponses des étudiants</button>
+                    <div id="studentResponses" style="display:none; margin-top:20px;">
+                        <h2>Réponses des étudiants</h2>
+                        <div id="responsesList"></div>
+
+                        <!-- Bloc commentaire -->
+                        <div id="commentSection" style="margin-top:30px;">
+                            <h3>Ajouter un commentaire</h3>
+                            <textarea id="commentContent" rows="4" class="form-control" placeholder="Écrire un commentaire..."></textarea>
+                            <button id="submitCommentBtn" class="btn btn-primary" style="margin-top:10px;">Ajouter</button>
+
+                            <div id="commentList" style="margin-top:20px;">
+                                <h4>Commentaires existants</h4>
+                                {% for commentaire in commentaires %}
+                                    <div class="comment-item" data-id="{{ commentaire.id }}">
+                                        <strong>{{ commentaire.auteur }}</strong> 
+                                        <span>({{ commentaire.datecre|date('d/m/Y') }})</span>
+                                        <p>{{ commentaire.contenu }}</p>
+                                          <button class="edit-btn btn btn-outline btn-sm" data-url="{{ path('commentaire_edit', {'id': commentaire.id}) }}">
+        ✏️ Modifier
+    </button>
+
+    <button class="delete-btn btn btn-outline btn-sm" data-url="{{ path('commentaire_delete', {'id': commentaire.id}) }}">
+        🗑️ Supprimer
+    </button>
+                                    </div>
+                                {% else %}
+                                    <p>Aucun commentaire pour le moment.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <button class="btn btn-block" disabled>Accès réservé</button>
+                {% endif %}
+
                 <p class="exam-lock" id="examLock">Vérification de la disponibilité de l’examen...</p>
                 <div class="exam-progress">
                     <span>Progression</span>
@@ -170,6 +222,7 @@
                     </div>
                 </div>
             </aside>
+
 
         </div>
     </section>
@@ -219,6 +272,75 @@ a { text-decoration: none; transition: all 0.2s; }
     pointer-events: none;
 }
 
+/* Bloc commentaire général */
+#teacherComments, #commentSection {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Chaque commentaire */
+.comment-item, .teacher-comment {
+    background-color: #ffffff;
+    border-left: 4px solid #007bff;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Hover effet */
+.comment-item:hover, .teacher-comment:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* Auteur + date */
+.comment-item strong, .teacher-comment strong {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.comment-item span, .teacher-comment span {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-left: 10px;
+}
+
+/* Contenu */
+.comment-item p, .teacher-comment p {
+    margin: 8px 0 0 0;
+    line-height: 1.5;
+}
+
+/* Boutons */
+.comment-item button, .teacher-comment button {
+    font-size: 0.8em;
+    padding: 3px 8px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+/* Couleurs différentes pour Modifier/Supprimer */
+.comment-item .edit-btn, .teacher-comment .edit-btn {
+    background-color: #ffc107;
+    color: #fff;
+    border: none;
+}
+
+.comment-item .delete-btn, .teacher-comment .delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+}
+
+/* Boutons hover */
+.comment-item button:hover, .teacher-comment button:hover {
+    opacity: 0.85;
+    cursor: pointer;
+}
 
 .exam-header .badge {
     background: rgba(255,255,255,0.25);
@@ -487,30 +609,552 @@ a { text-decoration: none; transition: all 0.2s; }
     #timerBox { font-size:16px; }
 }
 
+#studentResponses {
+    margin-top: 20px;
+}
+
+.response-card {
+    background-color: #f8f9fa; /* couleur claire */
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.response-card strong {
+    color: #343a40;
+}
+
+.response-card em {
+    color: #6c757d;
+}
+
+.response-card p {
+    margin: 5px 0;
+}
+
+.response-card small {
+    color: #adb5bd;
+}
+/* ===== BLOC COMMENTAIRES ===== */
+#commentSection {
+    margin-top: 30px;
+}
+
+#commentSection h3 { 
+    font-size: 20px; 
+    color: var(--primary); 
+    margin-bottom: 15px; 
+}
+
+/* FORMULAIRE */
+#commentContent {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+#commentContent:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(31,79,101,0.25);
+    outline: none;
+}
+
+#submitCommentBtn {
+    margin-top: 10px;
+    padding: 10px 18px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+#submitCommentBtn i { font-size:16px; }
+#submitCommentBtn:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* LISTE DES COMMENTAIRES */
+.comment-item {
+    display: flex;
+    gap: 12px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+.comment-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+}
+
+/* AVATAR */
+.comment-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--highlight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* CONTENU */
+.comment-content {
+    flex: 1;
+}
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.comment-header strong { color: var(--primary); font-size: 14px; }
+.comment-header span { font-size: 12px; color: #6b7280; }
+
+.comment-text {
+    margin: 6px 0 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #374151;
+}
+
+/* BOUTONS ACTION */
+.comment-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.comment-actions button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.comment-actions button i { font-size:14px; }
+
+/* DELETE */
+.comment-actions .delete-btn {
+    background: #ef4444;
+    color: #fff;
+}
+.comment-actions .delete-btn:hover { background: #dc2626; transform: translateY(-2px); }
+
+/* EDIT */
+.comment-actions .edit-btn {
+    background: #6b7280;
+    color: #fff;
+}
+.comment-actions .edit-btn:hover { background: #4b5563; transform: translateY(-2px); }
+
+/* LIKE */
+.comment-actions .like-btn {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+.comment-actions .like-btn.liked {
+    color: #ef4444;
+}
+.comment-actions .like-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: translateY(-2px);
+}
+.comment-actions .like-btn i {
+    transition: all 0.3s ease;
+}
+.comment-actions .like-btn.liked i {
+    animation: pulseHeart 0.5s ease forwards;
+}
+
+@keyframes pulseHeart {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.4); }
+    50% { transform: scale(1.2); }
+    75% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+/* COMMENTAIRES - SOCIAL MEDIA STYLE */
+.comment-item {
+    display: flex;
+    gap: 12px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+.comment-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+}
+
+/* AVATAR */
+.comment-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--highlight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* CONTENU */
+.comment-content {
+    flex: 1;
+}
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.comment-header strong { color: var(--primary); font-size: 14px; }
+.comment-header span { font-size: 12px; color: #6b7280; }
+.comment-text {
+    margin: 6px 0 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #374151;
+}
+
+/* BOUTONS ACTION */
+.comment-actions {
+    display: flex;
+    gap: 8px;
+}
+.comment-actions button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.comment-actions i { font-size:14px; transition: transform 0.3s ease; }
+
+/* DELETE */
+.comment-actions .delete-btn { background:#ef4444; color:#fff; }
+.comment-actions .delete-btn:hover { background:#dc2626; transform:translateY(-2px); }
+
+/* EDIT */
+.comment-actions .edit-btn { background:#6b7280; color:#fff; }
+.comment-actions .edit-btn:hover { background:#4b5563; transform:translateY(-2px); }
+
+/* LIKE */
+.comment-actions .like-btn {
+    background:#fff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    position: relative;
+}
+.comment-actions .like-btn.liked {
+    color:#ef4444;
+}
+.comment-actions .like-btn:hover { background: var(--accent); color:#fff; transform:translateY(-2px); }
+
+/* PULSE + FLOATING HEART */
+@keyframes pulseHeart {
+    0% { transform: scale(1); opacity:1; }
+    25% { transform: scale(1.4); opacity:1; }
+    50% { transform: scale(1.2); opacity:1; }
+    75% { transform: scale(1.3); opacity:1; }
+    100% { transform: scale(1); opacity:1; }
+}
+@keyframes floatHeart {
+    0% { transform: translateY(0); opacity:1; }
+    50% { transform: translateY(-20px); opacity:0.7; }
+    100% { transform: translateY(-40px); opacity:0; }
+}
+.floating-heart {
+    position: absolute;
+    font-size: 18px;
+    color: #ef4444;
+    animation: floatHeart 1s ease forwards;
+    pointer-events: none;
+}
 
 </style>
 
 
-
-
 {% block javascripts %}
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const startBtn = document.getElementById('startExamBtn');
+    const examForm = document.getElementById('examForm');
+    const commentList = document.getElementById('commentList');
+    const submitExamBtn = document.getElementById('submitExamBtn');
+ const teacherCommentsDiv = document.getElementById('teacherComments');
+    const teacherCommentList = document.getElementById('teacherCommentList');
+
+    // Affiche le formulaire et le bouton quand l'examen commence
+    if(startBtn) {
+        startBtn.addEventListener('click', function() {
+            examForm.style.display = 'block';
+            submitExamBtn.style.display = 'inline-block';
+            startBtn.disabled = true;
+        });
+    }
+
+    // Soumettre l'examen via AJAX
+    if(submitExamBtn && examForm) {
+        submitExamBtn.addEventListener('click', function() {
+            fetch("/examen/2/submit", {
+                method: "POST",
+                body: new FormData(examForm)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert(data.message);
+                    // Désactiver le formulaire après soumission
+                    examForm.querySelectorAll('input, button').forEach(el => el.disabled = true);
+
+                    submitExamBtn.disabled = true;
+                     // ===== Afficher les commentaires de l'enseignant =====
+                    fetch(`/examen/2/comments`) // route qui renvoie les commentaires au format JSON
+                        .then(res => res.json())
+                        .then(comments => {
+                            teacherCommentList.innerHTML = ''; // vider la liste avant ajout
+                            if(comments.length === 0) {
+                                teacherCommentList.innerHTML = '<p>Aucun commentaire pour le moment.</p>';
+                            } else {
+                                comments.forEach(c => {
+                                    const div = document.createElement('div');
+                                    div.className = 'teacher-comment';
+                                    div.style.marginBottom = '10px';
+                                    div.innerHTML = `
+                                        <strong>${c.auteur}</strong>
+                                        <span>(${c.date})</span>
+                                        <p>${c.contenu}</p>
+                                    `;
+                                    teacherCommentList.appendChild(div);
+                                });
+                            }
+                            teacherCommentsDiv.style.display = 'block'; // afficher le bloc
+                        })
+                        .catch(() => {
+                            teacherCommentList.innerHTML = '<p>Impossible de charger les commentaires.</p>';
+                            teacherCommentsDiv.style.display = 'block';
+                        });
+                } else {
+                    alert(data.message || "Erreur lors de l'envoi de l'examen");
+                }
+            })
+            .catch(() => alert("Erreur serveur"));
+        });
+    }
+    if (!window.commentHandlerAttached) {
+    window.commentHandlerAttached = true;
+    const submitBtn = document.getElementById('submitCommentBtn');
+    const commentContent = document.getElementById('commentContent');
+    const commentList = document.getElementById('commentList');
+const commentsDiv = document.getElementById('commentSection');
+
+if (submitBtn && commentContent && commentList) {
+submitBtn.addEventListener('click', function() {
+        const content = commentContent.value.trim();
+        if (!content) {
+            alert("Le commentaire ne peut pas être vide.");
+            return;
+        }
+
+        fetch('/commentaire/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                'comment': content,
+                'examenId': '2'
+            })
+        })
+        .then(response => response.json())
+       .then(data => {
+    if (data.success) {
+        // Ajouter le commentaire dans la liste
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        div.dataset.id = data.id;
+    div.innerHTML = `
+    <strong>${data.auteur}</strong>
+    <span>(${data.date})</span>
+    <p>${data.contenu}</p>
+    <button class="edit-btn btn btn-outline btn-sm"
+            data-url="/commentaire/${data.id}/edit">
+        ✏️ Modifier
+    </button>
+    <button class="delete-btn btn btn-outline btn-sm"
+            data-url="/commentaire/${data.id}/delete">
+        🗑️ Supprimer
+    </button>
+`;
+
+
+        commentList.prepend(div);
+        commentContent.value = '';
+    } else {
+        alert(data.message || "Erreur lors de l'ajout du commentaire");
+    }
+})
+
+        .catch(err => console.error(err));
+    });
+}
+    // ===== SUPPRESSION & MODIFICATION COMMENTAIRES (Event Delegation) =====
+    commentList.addEventListener('click', function(e) {
+        const btn = e.target;
+        const commentDiv = btn.closest('.comment-item');
+        if (!commentDiv) return;
+
+   // --- SUPPRESSION ---
+        if (btn.classList.contains('delete-btn')) {
+            if (!confirm("Voulez-vous vraiment supprimer ce commentaire ?")) return;
+
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    commentDiv.remove();
+                    alert("Commentaire supprimé avec succès !");
+                } else {
+                    alert(data.message || "Erreur lors de la suppression");
+                }
+            })
+            .catch(() => alert("Erreur réseau, impossible de supprimer le commentaire"));
+        }
+
+        // --- MODIFICATION ---
+        if (btn.classList.contains('edit-btn')) {
+            const p = commentDiv.querySelector('p');
+            const oldContent = p.textContent;
+            const newContent = prompt("Modifier le commentaire :", oldContent);
+            if (!newContent || newContent.trim() === oldContent) return;
+
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({ contenu: newContent })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    p.textContent = newContent;
+                    alert("Commentaire modifié avec succès !");
+                } else {
+                    alert(data.message || "Erreur lors de la modification");
+                }
+            })
+            .catch(() => alert("Erreur réseau, impossible de modifier le commentaire"));
+        }
+    });
+    }
+    
+ const btn = document.getElementById('accessResponsesBtn');
+const container = document.getElementById('studentResponses');
+const list = document.getElementById('responsesList');
+
+if(btn) {
+    btn.addEventListener('click', function() {
+       fetch('/examen/2/reponses')
+    .then(res => res.json())
+    .then(data => {
+        list.innerHTML = '';
+        if(data.length === 0){
+            list.innerHTML = '<p>Aucune réponse soumise pour cet examen.</p>';
+            container.style.display = 'block';
+            return;
+        }
+
+        data.forEach(etudiant => {
+            const card = document.createElement('div');
+            card.classList.add('student-card');
+            card.style.border = '1px solid #ccc';
+            card.style.padding = '15px';
+            card.style.marginBottom = '15px';
+            card.style.borderRadius = '8px';
+            card.style.backgroundColor = '#f9f9f9';
+
+            card.innerHTML = `<h3 style="margin:0 0 5px 0;">Étudiant : ${etudiant.etudiant}</h3>
+                              <small style="color: #555;">Date du dernier essai : ${etudiant.date}</small>`;
+
+            const questionsDiv = document.createElement('div');
+            questionsDiv.style.marginTop = '10px';
+
+            for(const [question, reponse] of Object.entries(etudiant.reponses)){
+                const qDiv = document.createElement('div');
+                qDiv.classList.add('response-card');
+                qDiv.style.marginBottom = '5px';
+                qDiv.innerHTML = `<strong>${question} :</strong> ${reponse}`;
+                questionsDiv.appendChild(qDiv);
+            }
+
+            card.appendChild(questionsDiv);
+            list.appendChild(card);
+        });
+
+        container.style.display = 'block';
+    })
+    .catch(err => {
+        console.error('Erreur lors du fetch des réponses :', err);
+        list.innerHTML = '<p>Impossible de charger les réponses pour le moment.</p>';
+        container.style.display = 'block';
+    });
+
+    });
+}
 
     // ===== ELEMENTS =====
-    const startBtn = document.getElementById('startExamBtn');
     const examContainer = document.getElementById('examContainer');
     const examLock = document.getElementById('examLock');
     const progressFill = document.getElementById('progressFill');
     const timerEl = document.getElementById('timer');
-    const examForm = document.getElementById('examForm');
-    const commentsDiv = document.getElementById('examComments');
     const addCommentForm = document.getElementById('addCommentForm');
 
     if (!startBtn || !examContainer || !examForm) return;
 
     // ===== VERIFICATION DATE =====
-    const endDate = new Date("{{ examen.datefin|date('Y-m-d H:i:s') }}");
+    const endDate = new Date("2026-02-15 00:00:00");
     const now = new Date();
     let isAccessible = now <= endDate;
 
@@ -526,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ===== TIMER =====
-    let totalTime = {{ examen.duree }} * 60; // secondes
+    let totalTime = 1 * 60; // secondes
     let elapsed = 0;
     let interval = null;
 
@@ -552,11 +1196,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1000);
     }, { once: true }); // évite double déclenchement si bouton cliqué plusieurs fois
 
-    // ===== SUBMIT EXAM =====
-    examForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        finishExam("✅ Examen soumis avec succès !");
-    }, { once: true });
+   
 
     function finishExam(message) {
         clearInterval(interval);
@@ -573,107 +1213,7 @@ document.addEventListener('DOMContentLoaded', function () {
         form.querySelectorAll('input, textarea, button, select').forEach(el => el.disabled = true);
     }
 
-    // ===== FORMULAIRE COMMENTAIRES =====
-  if (addCommentForm && !addCommentForm.dataset.listenerAttached) {
-    addCommentForm.dataset.listenerAttached = "true";
-
-    const commentList = document.getElementById('commentList');
-    const commentInput = document.getElementById('comment');
-    const charCount = document.getElementById('charCount');
-    const submitBtn = addCommentForm.querySelector('button');
-
-    function toggleButton() {
-        submitBtn.disabled = !commentInput.value.trim();
-        charCount.textContent = (500 - commentInput.value.length) + " caractères restants";
-    }
-
-    commentInput.addEventListener('input', toggleButton);
-    toggleButton();
-
-    addCommentForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const text = commentInput.value.trim();
-        if (!text) return;
-
-        fetch('{{ path("commentaire_add") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({
-                comment: text,
-                examenId: "{{ examen.id }}"
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) return alert(data.message || "Erreur lors de l'ajout du commentaire");
-
-            const div = document.createElement('div');
-            div.className = 'comment-block';
-       div.innerHTML = `
-    <div class="comment-header">
-        <strong>${data.auteur}</strong>
-        <span class="comment-date">${data.date}</span>
-    </div>
-    <p>${data.contenu}</p>
-    <div class="comment-meta">
-        <span class="views"><i class="fas fa-eye"></i> Vues : ${data.nbvue}</span> |
-        <span class="likes"><i class="fas fa-thumbs-up"></i> Likes : ${data.likes}</span>
-        <button class="like-btn btn btn-outline btn-sm" data-id="${data.id}">
-            <i class="fas fa-thumbs-up"></i> Like
-        </button>
-        <button class="edit-btn btn btn-outline btn-sm" data-id="${data.id}">✏️ Modifier</button>
-        <button class="delete-btn btn btn-outline btn-sm" data-id="${data.id}">🗑️ Supprimer</button>
-    </div>
-`;
-
-
-            attachView(div);
-            commentList.prepend(div);
-            addCommentForm.reset();
-            toggleButton();
-        })
-        .catch(() => alert("Erreur réseau, impossible d'ajouter le commentaire"));
-    });
-}
-
-    // ===== VUES COMMENTAIRES =====
-function attachView(comment) {
-    if (comment.dataset.viewListenerAttached) return; // ✅ ne rien faire si déjà attaché
-
-    const viewsSpan = comment.querySelector('.views');
-    let viewed = false; // pour éviter plusieurs appels si la souris entre plusieurs fois
-
-    comment.addEventListener('mouseenter', function() {
-        if (viewed) return;
-        viewed = true;
-
-        const commentId = comment.querySelector('.like-btn')?.dataset.id;
-        if (!commentId) return;
-
-        fetch(`/commentaire/view/${commentId}`, {
-            method: 'POST',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                viewsSpan.textContent = "Vues : " + data.nbvue;
-            }
-        })
-        .catch(() => console.log("Erreur lors de l'incrémentation des vues"));
-    });
-
-    comment.dataset.viewListenerAttached = "true"; // ⚡ flag pour ne pas attacher plusieurs fois
-}
-
-// appliquer aux commentaires existants
-document.querySelectorAll('.comment-block').forEach(attachView);
-
-
-
+   
     // ===== LIKE COMMENTAIRES =====
     if (!window.likeHandlerAttached) { // évite double attachement
         window.likeHandlerAttached = true;
@@ -707,63 +1247,9 @@ document.querySelectorAll('.comment-block').forEach(attachView);
             .catch(() => alert("Erreur lors du like"));
         });
     }
-// ===== MODIFIER COMMENTAIRE =====
-// ===== SUPPRIMER COMMENTAIRE =====
-document.addEventListener('click', function(e) {
-    if (!e.target.classList.contains('delete-btn')) return;
-
-    const btn = e.target;
-    const commentBlock = btn.closest('.comment-block');
-    const commentId = btn.dataset.id;
-
-    if (!confirm("Voulez-vous vraiment supprimer ce commentaire ?")) return;
-
-    fetch('{{ path("commentaire_delete", {"id": "COMMENT_ID"}) }}'.replace("COMMENT_ID", commentId), {
-    method: 'POST',
-    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-})
-.then(res => res.json())
-.then(data => {
-    if (!data.success) return alert(data.message || "Erreur lors de la suppression");
-    commentBlock.remove();
-    alert("Commentaire supprimé");
-})
-.catch(() => alert("Erreur réseau, impossible de supprimer le commentaire"));
-});
-// ===== MODIFIER COMMENTAIRE =====
-document.addEventListener('click', function(e) {
-    if (!e.target.classList.contains('edit-btn')) return;
-
-    const btn = e.target;
-    const commentBlock = btn.closest('.comment-block');
-    const commentId = btn.dataset.id;
-    const p = commentBlock.querySelector('p');
-    const oldContent = p.textContent;
-
-    // Demander le nouveau contenu
-    const newContent = prompt("Modifier le commentaire :", oldContent);
-    if (newContent === null || newContent.trim() === "" || newContent === oldContent) return;
-
-    fetch('{{ path("commentaire_edit", {"id": "COMMENT_ID"}) }}'.replace("COMMENT_ID", commentId), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: new URLSearchParams({
-            contenu: newContent
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (!data.success) return alert(data.message || "Erreur lors de la modification");
-        p.textContent = newContent;
-        alert("Commentaire modifié avec succès !");
-    })
-    .catch(() => alert("Erreur réseau, impossible de modifier le commentaire"));
+    
 });
 
-});
 </script>
 
 {% endblock %}

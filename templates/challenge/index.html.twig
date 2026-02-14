@@ -23,14 +23,14 @@
         <div class="sidebar-content">
             <nav class="sidebar-menu">
                 <ul>
-                    <li class="active"><a href="{{path('app_back')}}"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
-                    <li><a href="#"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
+                    <li class="active"><a href="{{path('dashboard')}}"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li><a href="{{path('app_users')}}"><i class="fas fa-users"></i><span>Utilisateurs</span></a></li>
                     <li><a href="#"><i class="fas fa-book-open"></i><span>Contenu pédagogique</span></a></li>
                     <li class="has-submenu">
                         <a href="#"><i class="fas fa-graduation-cap"></i><span>Evaluation</span><i class="fas fa-chevron-down submenu-toggle"></i></a>
                         <ul class="submenu">
                             <li><a href="{{ path('admin_examen') }}">Examen</a></li>
-                            <li><a href="#">Challenge</a></li>
+                            <li><a href="{{ path('app_challenges') }}">Challenge</a></li>
                         </ul>
                     </li>
                     <li><a href="#"><i class="fas fa-question-circle"></i><span>Questionnaire</span></a></li>

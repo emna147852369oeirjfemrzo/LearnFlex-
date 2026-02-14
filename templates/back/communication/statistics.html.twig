@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques des Communications{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">Statistiques des Communications</h1>
+            <p class="mb-0">Analyse et données sur les communications</p>
+        </div>
+        <a href="{{ path('back_communication_index') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour
+        </a>
+    </div>
+    
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-comments fa-3x"></i>
+                    </div>
+                    <h2 class="mb-0">{{ total }}</h2>
+                    <p class="text-muted mb-0">Total</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-danger mb-2">
+                        <i class="fas fa-wifi fa-3x"></i>
+                    </div>
+                    <h2 class="mb-0">{{ liveCount }}</h2>
+                    <p class="text-muted mb-0">En direct</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-video fa-3x"></i>
+                    </div>
+                    <h2 class="mb-0">{{ recordCount }}</h2>
+                    <p class="text-muted mb-0">Enregistrées</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-chart-line fa-3x"></i>
+                    </div>
+                    <h2 class="mb-0">
+                        {% if total > 0 %}
+                            {{ ((liveCount / total) * 100)|round(1) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </h2>
+                    <p class="text-muted mb-0">Taux en direct</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tableau récapitulatif -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Répartition par état</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Planifié</th>
+                            <th>En cours</th>
+                            <th>Terminé</th>
+                            <th>Annulé</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>En direct</strong></td>
+                            <td>
+                                {% set livePlanifie = 0 %}
+                                <span class="badge bg-warning">{{ livePlanifie }}</span>
+                            </td>
+                            <td>
+                                {% set liveEnCours = 0 %}
+                                <span class="badge bg-success">{{ liveEnCours }}</span>
+                            </td>
+                            <td>
+                                {% set liveTermine = 0 %}
+                                <span class="badge bg-info">{{ liveTermine }}</span>
+                            </td>
+                            <td>
+                                {% set liveAnnule = 0 %}
+                                <span class="badge bg-danger">{{ liveAnnule }}</span>
+                            </td>
+                            <td><strong>{{ liveCount }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Enregistré</strong></td>
+                            <td>
+                                {% set recordPlanifie = 0 %}
+                                <span class="badge bg-warning">{{ recordPlanifie }}</span>
+                            </td>
+                            <td>
+                                {% set recordEnCours = 0 %}
+                                <span class="badge bg-success">{{ recordEnCours }}</span>
+                            </td>
+                            <td>
+                                {% set recordTermine = 0 %}
+                                <span class="badge bg-info">{{ recordTermine }}</span>
+                            </td>
+                            <td>
+                                {% set recordAnnule = 0 %}
+                                <span class="badge bg-danger">{{ recordAnnule }}</span>
+                            </td>
+                            <td><strong>{{ recordCount }}</strong></td>
+                        </tr>
+                        <tr class="table-light">
+                            <td><strong>Total</strong></td>
+                            <td><strong>{{ livePlanifie + recordPlanifie }}</strong></td>
+                            <td><strong>{{ liveEnCours + recordEnCours }}</strong></td>
+                            <td><strong>{{ liveTermine + recordTermine }}</strong></td>
+                            <td><strong>{{ liveAnnule + recordAnnule }}</strong></td>
+                            <td><strong class="text-primary">{{ total }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Note :</strong> Ces statistiques sont basiques. Pour des statistiques détaillées par état, 
+                il faudrait modifier le repository pour compter par type ET par état.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="d-flex justify-content-between mt-4">
+        <div>
+            <a href="{{ path('back_communication_export_pdf') }}" class="btn btn-success" target="_blank">
+                <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+            </a>
+        </div>
+        <a href="{{ path('back_communication_index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+// Simple animation for stats cards
+document.addEventListener('DOMContentLoaded', function() {
+    const statsCards = document.querySelectorAll('.card h2');
+    statsCards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(10px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

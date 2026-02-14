@@ -1,0 +1,233 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Événements{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+ <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="nav-logo">
+          <span>LearnFlex</span><span class="highlight">+</span>
+        </div>
+        <button class="sidebar-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <div class="sidebar-content">
+        <nav class="sidebar-menu">
+          <ul>
+            <li class="active">
+              <a href="{{path('dashboard')}}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{path('app_users')}}">
+                <i class="fas fa-users"></i>
+                <span>Utilisateurs</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fas fa-book-open"></i>
+                <span>contenu pédagogique</span>
+              </a>
+            </li>
+             <li class="has-submenu">
+    <a href="#">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Evaluation</span>
+        <i class="fas fa-chevron-down submenu-toggle"></i>
+    </a>
+    <ul class="submenu">
+        <li>
+            <a href="{{ path('admin_examen') }}">Examen</a>
+        </li>
+        <li>
+            <a href="{{ path ('app_challenges')}}">Challenge</a>
+        </li>
+    </ul>
+</li>
+
+            <li>
+              <a href="#">
+                <i class="fas fa-question-circle"></i>
+                <span>Questionnaire</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fas fa-directions"></i>
+                <span>Orientation</span>
+              </a>
+            </li>
+           
+                <li>
+                  <a href="{{ path('app_organisme_index') }}">
+
+                    <i class="fas fa-building"></i>
+                    <span>Organisme</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ path('app_evenement_index') }}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Événement</span>
+                  </a>
+                </li>
+              
+            <li>
+              <a href="#">
+                <i class="fas fa-comments"></i>
+                <span>Forum</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      
+      <div class="sidebar-footer">
+        <a href="#" class="user-profile">
+          <img src="{{ asset('assets/images/placeholder-admin.png') }}" alt="Admin" class="user-img">
+          <div class="user-info">
+            <h4>Admin User</h4>
+            <p>Administrateur</p>
+          </div>
+        </a>
+        <a href="#" class="logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Déconnexion</span>
+        </a>
+      </div>
+    </aside>
+   
+
+<div class="main-content">
+   <div class="container mt-4 table-container">
+      <h3>Liste des Événements</h3>
+
+      <div class="controls-row" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+         <div>
+            <a href="{{ path('app_evenement_new') }}" class="btn btn-sm btn-success">
+               <i class="fas fa-plus"></i> Ajouter un événement
+            </a>
+         </div>
+
+         <!-- Search form -->
+         <form method="get" action="{{ path('evenement_search') }}" class="evenement-search" style="display:flex; align-items:center; gap:8px;">
+            <label for="query" style="display:flex; align-items:center; gap:8px; font-weight:500; color:#333;">
+               <i class="fas fa-search"></i>
+               <span class="sr-only">Rechercher</span>
+            </label>
+            <input id="query" name="query" type="text" value="{{ app.request.get('query') }}" placeholder="Rechercher par titre..." style="padding:8px 10px; border:1px solid #ccc; border-radius:4px; min-width:220px;">
+            <button type="submit" class="btn btn-sm btn-primary" style="padding:8px 12px;"><i class="fas fa-arrow-right"></i></button>
+         </form>
+
+         <!-- Sort by heure buttons (independent from search) -->
+         <div class="sort-controls" style="display:flex; gap:8px; align-items:center;">
+            <span style="font-weight:500; color:#333;">Trier par heure</span>
+            <a href="{{ path('evenement_sort', {'direction':'ASC'}) }}" class="btn btn-sm" title="Trier par heure ascendant" style="background:#eef; border:1px solid #bbd;">
+               <i class="fas fa-sort-amount-down"></i>
+            </a>
+            <a href="{{ path('evenement_sort', {'direction':'DESC'}) }}" class="btn btn-sm" title="Trier par heure descendant" style="background:#fee; border:1px solid #dba;">
+               <i class="fas fa-sort-amount-up"></i>
+            </a>
+         </div>
+      </div>
+
+      <!-- Tableau des événements -->
+      <div class="table-wrapper">
+         <table class="evenement-table mt-3">
+            <thead>
+               <tr>
+                  <th>ID</th>
+                  <th>Titre</th>
+                  <th>Description</th>
+                  <th>Date Début</th>
+                  <th>Date Fin</th>
+                  <th>Lieu</th>
+                  <th>Capacité Max</th>
+                  <th>Type Événement</th>
+                  <th>Heure Début</th>
+                  <th>Heure Fin</th>
+                  <th>Mode</th>
+                  <th>Public Cible</th>
+                  <th>Domaines Concernés</th>
+                  <th>Organisateur</th>
+                  <th>Email Contact</th>
+                  <th>Téléphone Contact</th>
+                  <th>Lien Inscription</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for evenement in evenements %}
+                  <tr>
+                     <td>{{ evenement.id }}</td>
+                     <td>{{ evenement.titre }}</td>
+                     <td>{{ evenement.description }}</td>
+                     <td>{{ evenement.datedebut ? evenement.datedebut|date('d/m/Y H:i') : '-' }}</td>
+                     <td>{{ evenement.datefin ? evenement.datefin|date('d/m/Y H:i') : '-' }}</td>
+                     <td>{{ evenement.lieu }}</td>
+                     <td>{{ evenement.capacitemax }}</td>
+                     <td>{{ evenement.typeevenement }}</td>
+                     <td>{{ evenement.heuredebut ? evenement.heuredebut|date('H:i') : '-' }}</td>
+                     <td>{{ evenement.heurefin ? evenement.heurefin|date('H:i') : '-' }}</td>
+                     <td>{{ evenement.mode }}</td>
+                     <td>{{ evenement.publiccible }}</td>
+                     <td>{{ evenement.domainesconcernes }}</td>
+                     <td>{{ evenement.organisateur }}</td>
+                     <td>{{ evenement.contactemail }}</td>
+                     <td>{{ evenement.contacttelephone }}</td>
+                     <td>{{ evenement.lieninscription }}</td>
+                     <td>{{ evenement.statut }}</td>
+                     <td class="actions">
+                        <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                        <a href="{{ path('app_evenement_delete', { 'id': evenement.id }) }}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Voulez-vous vraiment supprimer cet événement ?');">Supprimer</a>
+                     </td>
+                  </tr>
+               {% else %}
+                  <tr>
+                     <td colspan="19" class="text-center text-muted">Aucun événement trouvé</td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   </div>
+</div>
+
+<style>
+
+   body { display: flex; margin: 0; font-family: Arial, sans-serif; }
+   
+   
+   .main-content { margin-left: 250px; flex: 1; padding: 20px; background: #fff; }
+   .table-container { max-width: 100%; }
+   .table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 80vh; width: calc(100vw - 290px); }
+   .evenement-table { width: 2280px; border-collapse: collapse; font-size: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+   .evenement-table th, .evenement-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; min-width: 120px; white-space: nowrap; }
+   .evenement-table th { background: #007bff; color: white; font-weight: bold; }
+   .evenement-table tbody tr:nth-child(even) { background: #f8f9fa; }
+   .evenement-table tbody tr:hover { background: #e9ecef; cursor: pointer; }
+   .evenement-table .actions a { margin-right: 5px; padding: 5px 10px; border-radius: 4px; text-decoration: none; }
+   .evenement-table .actions .btn-warning { background: #ffc107; color: black; }
+   .evenement-table .actions .btn-danger { background: #dc3545; color: white; }
+   .sr-only { position: absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+   @media (max-width:900px) { .evenement-search input { min-width:120px; } }
+   
+   
+</style>
+
+{% endblock %}

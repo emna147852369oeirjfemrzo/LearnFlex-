@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Organismes{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Organismes</h2>
+
+    <form method="get" action="{{ path('organisme_search') }}" class="search-form" style="margin-bottom:16px; display:flex; gap:8px; align-items:center;">
+        <label for="query" style="display:flex; align-items:center; gap:8px;">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <span>Rechercher</span>
+        </label>
+        <input id="query" name="query" type="text" value="{{ app.request.get('query') }}" placeholder="Nom de l'organisme" style="padding:8px; flex:1;">
+        <button type="submit" class="btn btn-primary">OK</button>
+    </form>
+
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Type sponsor</th>
+                    <th>Localisation</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for organisme in organismes %}
+                    <tr>
+                        <td>{{ organisme.id }}</td>
+                        <td>{{ organisme.nom }}</td>
+                        <td>{{ organisme.typesponsor }}</td>
+                        <td>{{ organisme.localisation }}</td>
+                        <td>{{ organisme.emailcontact }}</td>
+                        <td>{{ organisme.telephone }}</td>
+                       <td class="actions">
+    <a href="{{ path('app_organisme_edit', {'id': organisme.id}) }}"
+       class="action-btn edit"
+       title="Modifier">
+        <i class="fas fa-edit"></i>
+    </a>
+
+    <a href="{{ path('app_organisme_delete', {'id': organisme.id}) }}"
+       class="action-btn delete"
+       onclick="return confirm('Voulez-vous vraiment supprimer cet organisme ?');"
+       title="Supprimer">
+        <i class="fas fa-trash"></i>
+    </a>
+</td>
+
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Aucun organisme trouvé</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

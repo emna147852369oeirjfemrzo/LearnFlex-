@@ -1,0 +1,725 @@
+{% extends 'front/home.html.twig' %}
+
+{% block title %}{{ examen.titre }} | LearnFlex+{% endblock %}
+
+{% block header %}
+<header class="landing-header">
+    <div class="container">
+        <div class="header-left">
+            <div class="logo">
+                {# Logo clickable for Admin and Enseignant only #}
+                {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                    <a href="{{ path('dashboard') }}">
+                        <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                        <span class="logo-text">LearnFlexPlus</span>
+                    </a>
+                {% else %}
+                    <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                    <span class="logo-text">LearnFlexPlus</span>
+                {% endif %}
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li class="active"><a href="{{ path('app_front') }}">Accueil</a></li>
+                <li><a href="#">Contenus pédagogiques</a></li>
+                <li><a href="{{path('front_evaluation')}}">Evaluation</a></li>
+                <li><a href="#">Questionnaire</a></li>
+                <li><a href="{{ path('front_evenements') }}">Orientation</a></li>
+                <li><a href="#">Forum </a></li>
+            </ul>
+        </nav>
+        
+       <div class="header-right">
+            {# Dashboard button now optional, you can even remove it if logo is enough #}
+            {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                <a href="{{ path('dashboard') }}" class="btn btn-outline dashboard-btn">Dashboard</a>
+            {% endif %}
+
+            {# Logout for logged-in users #}
+            {% if app.user %}
+                <form action="{{ path('app_logout') }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-primary logout-btn">Déconnexion</button>
+                </form>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
+            {% endif %}
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+{% endblock %}
+{% block body %}
+<main class="exam-page">
+
+    <!-- ===== EXAM HEADER ===== -->
+    <section class="exam-header">
+        <div class="container">
+
+            <span class="badge">Examen</span>
+            <h1>{{ examen.titre }}</h1>
+            <p class="exam-description">{{ examen.description }}</p>
+
+            <div class="exam-meta">
+                <div class="meta-item">
+                    <div class="meta-icon bg-blue"><i class="fas fa-book"></i></div>
+                    <div><span>Matière</span><strong>{{ examen.matiere }}</strong></div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon bg-orange"><i class="fas fa-layer-group"></i></div>
+                    <div><span>Niveau</span><strong>{{ examen.niveauexamen|capitalize }}</strong></div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon bg-green"><i class="fas fa-clock"></i></div>
+                    <div><span>Durée</span><strong>{{ examen.duree }} min</strong></div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon bg-gray"><i class="fas fa-question-circle"></i></div>
+                    <div><span>Questions</span><strong>{{ examen.nbquestion }}</strong></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== EXAM CONTENT ===== -->
+    <section class="exam-content">
+        <div class="container grid">
+
+            <!-- PDF + FORMULAIRE + COMMENTAIRES (à gauche) -->
+            <div id="examContainer" style="display:none;">
+
+                <!-- PDF -->
+                <h2>Support de l’examen</h2>
+                {% if examen.pdf %}
+                    <div class="pdf-viewer">
+                        <iframe src="{{ asset('assets/exams/' ~ examen.pdf) }}"></iframe>
+                    </div>
+                    <div class="pdf-actions">
+                        <a href="{{ asset('assets/exams/' ~ examen.pdf) }}" target="_blank" class="btn btn-download">
+                            Télécharger le PDF
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">Aucun support PDF disponible pour cet examen.</div>
+                {% endif %}
+
+<div id="timerBox">
+    <span class="timer-icon">⏱️</span>
+    <span id="timer">00:00</span>
+</div>
+
+                <!-- FORMULAIRE QUESTIONS -->
+              <form id="examForm" style="margin-top:30px; display:none;">
+    <h2>Répondez aux questions</h2>
+    {% for i in 1..examen.nbquestion %}
+        <div class="question-card">
+            <div class="question-header">
+                <span>Question {{ i }}</span>
+            </div>
+            <div class="question-body">
+                <input type="text" name="q{{ i }}" id="q{{ i }}" placeholder="Écrivez votre réponse ici..." required>
+            </div>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn submit-btn">Soumettre</button>
+</form>
+
+
+                <!-- COMMENTAIRES -->
+                <div id="examComments" style="display:none; margin-top:30px;">
+                    <h2>Commentaires</h2>
+                    <div id="commentList">
+                        {% if examen.commentaires is not empty %}
+                            {% for comment in examen.commentaires %}
+                                <div class="comment-block">
+                                    <div class="comment-header">
+                                        <strong>{{ comment.auteur }}</strong>
+                                        <span class="comment-date">{{ comment.datecre|date('d/m/Y') }}</span>
+                                    </div>
+                                    <p>{{ comment.contenu }}</p>
+                               <div class="comment-meta">
+    <span class="views"><i class="fas fa-eye"></i> Vues : {{ comment.nbvue }}</span> |
+    <span class="likes"><i class="fas fa-thumbs-up"></i> Likes : {{ comment.likes }}</span>
+    <button class="like-btn btn btn-outline btn-sm" data-id="{{ comment.id }}">
+        <i class="fas fa-thumbs-up"></i> Like
+    </button>
+</div>
+
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Aucun commentaire pour cet examen.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- FORMULAIRE AJOUTER COMMENTAIRE -->
+                   <form id="addCommentForm" style="margin-top:20px;">
+    <h3>Ajouter un commentaire</h3>
+    <textarea name="comment" id="comment" placeholder="Écrire votre commentaire..." maxlength="500" required></textarea>
+    <small id="charCount" style="display:block; text-align:right; color:#555;">500 caractères restants</small>
+    <button type="submit" class="btn" disabled>Envoyer</button>
+</form>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIONS (à droite) -->
+            <aside class="exam-actions">
+                <h3>Accès à l’examen</h3>
+                <button id="startExamBtn" class="btn btn-block">▶ Commencer l’examen</button>
+                <p class="exam-lock" id="examLock">Vérification de la disponibilité de l’examen...</p>
+                <div class="exam-progress">
+                    <span>Progression</span>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width:0%">0%</div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </section>
+
+</main>
+
+<style>
+/* ===== PALETTE ===== */
+:root {
+    --primary: #1f4f65;    /* bleu foncé */
+    --secondary: #1f4f65;  /* orange clair */
+    --accent: #4DB6AC;     /* vert menthe */
+    --highlight: #90A4AE;  /* gris clair */
+}
+
+/* ===== GLOBAL ===== */
+body, .exam-page {
+    font-family: 'Poppins', sans-serif;
+    background: #f3f4f6;
+    color: #1f4f65;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+}
+
+a { text-decoration: none; transition: all 0.2s; }
+
+/* ===== EXAM HEADER ===== */
+.exam-header {
+    padding: 80px 20px 60px;
+    background: linear-gradient(135deg, #397693 0%, #397693 50%, #397693 100%);
+    color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ajouter un léger motif ou overlay pour moderniser */
+.exam-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 70%);
+    pointer-events: none;
+}
+
+
+.exam-header .badge {
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.exam-header h1 {
+    font-size: 50px;
+    margin: 20px 0 10px;
+    letter-spacing: 1px;
+}
+
+.exam-description {
+    font-size: 18px;
+    max-width: 700px;
+    margin: 0 auto;
+    color: rgba(255,255,255,0.85);
+}
+
+.exam-meta {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: rgba(255,255,255,0.15);
+    padding: 20px;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+}
+
+.meta-item:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.25);
+}
+
+.meta-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:22px;
+}
+
+.bg-blue { background: var(--primary); }
+.bg-orange { background: var(--secondary); }
+.bg-green { background: var(--accent); }
+.bg-gray { background: var(--highlight); }
+
+.meta-item span { font-size: 13px; color: rgba(255,255,255,0.75); }
+.meta-item strong { display:block; font-size:16px; color:#fff; }
+
+/* ===== EXAM CONTENT ===== */
+.exam-content .grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 40px; }
+@media (max-width:992px) { .exam-content .grid { grid-template-columns:1fr; } }
+
+.pdf-viewer {
+    border-radius: 20px;
+    overflow:hidden;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    height:500px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+.pdf-viewer iframe { width:100%; height:100%; border:none; }
+.pdf-actions { margin-top:15px; }
+.btn-download {
+    background: var(--primary);
+    color:white;
+}
+.btn-download:hover { background: var(--accent); transform: translateY(-2px); }
+
+/* ===== TIMER ===== */
+#timerBox {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:18px;
+    font-weight:600;
+    color:#1f4f65;
+    margin-top:20px;
+}
+#timerBox .timer-icon { font-size:24px; color: var(--primary); }
+
+/* ===== QUESTION FORM ===== */
+.question-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.question-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+.question-header { font-weight: 600; font-size: 16px; color: var(--primary); margin-bottom:10px; }
+.question-body input {
+    width:100%;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid #d1d5db;
+    font-size:15px;
+}
+.question-body input:focus {
+    border-color: var(--primary);
+    box-shadow:0 0 12px rgba(31,79,101,0.25);
+    outline:none;
+}
+.submit-btn {
+    padding:14px 0;
+    width:100%;
+    font-size:16px;
+    border-radius:14px;
+    margin-top:12px;
+    background: var(--primary);
+    color:#fff;
+}
+.submit-btn:hover { background: var(--accent); transform: translateY(-2px); }
+
+/* ===== EXAM ACTIONS ===== */
+.exam-actions {
+    background:#fff;
+    border-radius:20px;
+    padding:30px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.exam-actions h3 { margin-bottom:20px; }
+.btn-block {
+    width:100%;
+    padding:12px 0;
+    font-size:16px;
+    border-radius:14px;
+    background: var(--primary);
+    color:white;
+}
+.btn-block:hover { background: var(--accent); transform: translateY(-2px); }
+.exam-lock { margin-top:15px; font-size:14px; color: var(--highlight); }
+
+.exam-progress { margin-top:30px; }
+.progress-bar { background:#e5e7eb; height:16px; border-radius:30px; overflow:hidden; }
+.progress-fill {
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    height:100%;
+    font-size:13px;
+    text-align:center;
+    color:white;
+    transition: width 0.5s ease-in-out;
+}
+
+/* ===== COMMENTAIRES ===== */
+.comment-block {
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom:18px;
+}
+.comment-block:hover { transform: translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.12); }
+
+.comment-header { display:flex; justify-content:space-between; margin-bottom:8px; }
+.comment-header strong { color: var(--primary); }
+.comment-header .comment-date { color: var(--highlight); font-size:13px; }
+
+.comment-meta {
+    font-size:13px;
+    color:#374151;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:5px;
+}
+.comment-meta .views i { color: var(--secondary); }
+.comment-meta .likes i { color: var(--accent); }
+
+.comment-meta span i { margin-right:5px; transition: all 0.3s ease; }
+.comment-meta .views:hover i { transform: scale(1.2); color: var(--primary); }
+.comment-meta .likes:hover i { transform: scale(1.3); color: var(--primary); }
+
+/* ===== BOUTON LIKE AVEC CŒUR PULSE ===== */
+.comment-meta button.like-btn {
+    margin-left:auto;
+    border:1px solid var(--primary);
+    background:#fff;
+    color: var(--primary);
+    border-radius:10px;
+    padding:4px 10px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    transition: all 0.3s ease;
+    overflow:hidden;
+}
+
+.comment-meta button.like-btn i {
+    font-size:16px;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.comment-meta button.like-btn:hover {
+    background: var(--accent);
+    color:white;
+    transform: translateY(-2px);
+}
+
+.comment-meta button.like-btn:hover i {
+    transform: scale(1.2);
+}
+
+.comment-meta button.like-btn.liked i {
+    color: var(--accent);
+    animation: pulseHeart 0.5s ease forwards;
+}
+
+@keyframes pulseHeart {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.4); }
+    50% { transform: scale(1.2); }
+    75% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* ===== FORMULAIRE AJOUT COMMENTAIRE ===== */
+#addCommentForm textarea {
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid #d1d5db;
+}
+#addCommentForm textarea:focus {
+    border-color: var(--primary);
+    box-shadow:0 0 12px rgba(31,79,101,0.25);
+}
+#addCommentForm button {
+    border-radius:14px;
+    background: var(--primary);
+    color:white;
+    padding:10px 20px;
+}
+#addCommentForm button:hover:enabled { background: var(--accent); transform: translateY(-2px); }
+#addCommentForm button:disabled { background:#d1d5db; cursor:not-allowed; }
+#charCount { color: var(--highlight); font-size:13px; text-align:right; margin-top:2px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:768px){
+    .exam-header h1 { font-size:38px; }
+    .exam-description { font-size:16px; }
+    .exam-content .grid { grid-template-columns:1fr; gap:20px; }
+    #timerBox { font-size:16px; }
+}
+
+
+</style>
+
+
+
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ===== ELEMENTS =====
+    const startBtn = document.getElementById('startExamBtn');
+    const examContainer = document.getElementById('examContainer');
+    const examLock = document.getElementById('examLock');
+    const progressFill = document.getElementById('progressFill');
+    const timerEl = document.getElementById('timer');
+    const examForm = document.getElementById('examForm');
+    const commentsDiv = document.getElementById('examComments');
+    const addCommentForm = document.getElementById('addCommentForm');
+
+    if (!startBtn || !examContainer || !examForm) return;
+
+    // ===== VERIFICATION DATE =====
+    const endDate = new Date("{{ examen.datefin|date('Y-m-d H:i:s') }}");
+    const now = new Date();
+    let isAccessible = now <= endDate;
+
+    if (!isAccessible) {
+        startBtn.disabled = true;
+        examLock.textContent = "❌ L’examen a expiré.";
+        examContainer.style.display = 'block';
+        examForm.style.display = 'block';
+        disableForm(examForm);
+        commentsDiv.style.display = 'block';
+    } else {
+        examLock.textContent = "▶ Cliquez sur « Commencer l’examen »";
+    }
+
+    // ===== TIMER =====
+    let totalTime = {{ examen.duree }} * 60; // secondes
+    let elapsed = 0;
+    let interval = null;
+
+    startBtn.addEventListener('click', function () {
+        examContainer.style.display = 'block';
+        examForm.style.display = 'block';
+        examLock.style.display = 'none';
+        startBtn.disabled = true;
+
+        interval = setInterval(function () {
+            elapsed++;
+            let minutes = Math.floor(elapsed / 60);
+            let seconds = elapsed % 60;
+            timerEl.textContent = String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0');
+
+            let progressPercent = Math.min(Math.floor((elapsed / totalTime) * 100), 100);
+            progressFill.style.width = progressPercent + '%';
+            progressFill.textContent = progressPercent + '%';
+
+            if (elapsed >= totalTime || new Date() >= endDate) {
+                finishExam("⏰ Temps écoulé !");
+            }
+        }, 1000);
+    }, { once: true }); // évite double déclenchement si bouton cliqué plusieurs fois
+
+    // ===== SUBMIT EXAM =====
+    examForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        finishExam("✅ Examen soumis avec succès !");
+    }, { once: true });
+
+    function finishExam(message) {
+        clearInterval(interval);
+        disableForm(examForm);
+        progressFill.style.width = '100%';
+        progressFill.textContent = '100%';
+        commentsDiv.style.display = 'block';
+        examLock.textContent = message;
+        examLock.style.display = 'block';
+        alert(message);
+    }
+
+    function disableForm(form) {
+        form.querySelectorAll('input, textarea, button, select').forEach(el => el.disabled = true);
+    }
+
+    // ===== FORMULAIRE COMMENTAIRES =====
+  if (addCommentForm && !addCommentForm.dataset.listenerAttached) {
+    addCommentForm.dataset.listenerAttached = "true";
+
+    const commentList = document.getElementById('commentList');
+    const commentInput = document.getElementById('comment');
+    const charCount = document.getElementById('charCount');
+    const submitBtn = addCommentForm.querySelector('button');
+
+    function toggleButton() {
+        submitBtn.disabled = !commentInput.value.trim();
+        charCount.textContent = (500 - commentInput.value.length) + " caractères restants";
+    }
+
+    commentInput.addEventListener('input', toggleButton);
+    toggleButton();
+
+    addCommentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = commentInput.value.trim();
+        if (!text) return;
+
+        fetch('{{ path("commentaire_add") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                comment: text,
+                examenId: "{{ examen.id }}"
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) return alert(data.message || "Erreur lors de l'ajout du commentaire");
+
+            const div = document.createElement('div');
+            div.className = 'comment-block';
+        div.innerHTML = `
+    <div class="comment-header">
+        <strong>${data.auteur}</strong>
+        <span class="comment-date">${data.date}</span>
+    </div>
+    <p>${data.contenu}</p>
+    <div class="comment-meta">
+        <span class="views"><i class="fas fa-eye"></i> Vues : ${data.nbvue}</span> |
+        <span class="likes"><i class="fas fa-thumbs-up"></i> Likes : ${data.likes}</span>
+        <button class="like-btn btn btn-outline btn-sm" data-id="${data.id}">
+            <i class="fas fa-thumbs-up"></i> Like
+        </button>
+    </div>
+`;
+
+
+            attachView(div);
+            commentList.prepend(div);
+            addCommentForm.reset();
+            toggleButton();
+        })
+        .catch(() => alert("Erreur réseau, impossible d'ajouter le commentaire"));
+    });
+}
+
+    // ===== VUES COMMENTAIRES =====
+    // ===== VUES COMMENTAIRES =====
+function attachView(comment) {
+    if (comment.dataset.viewListenerAttached) return; // ✅ ne rien faire si déjà attaché
+
+    const viewsSpan = comment.querySelector('.views');
+    let viewed = false; // pour éviter plusieurs appels si la souris entre plusieurs fois
+
+    comment.addEventListener('mouseenter', function() {
+        if (viewed) return;
+        viewed = true;
+
+        const commentId = comment.querySelector('.like-btn')?.dataset.id;
+        if (!commentId) return;
+
+        fetch(`/commentaire/view/${commentId}`, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                viewsSpan.textContent = "Vues : " + data.nbvue;
+            }
+        })
+        .catch(() => console.log("Erreur lors de l'incrémentation des vues"));
+    });
+
+    comment.dataset.viewListenerAttached = "true"; // ⚡ flag pour ne pas attacher plusieurs fois
+}
+
+// appliquer aux commentaires existants
+document.querySelectorAll('.comment-block').forEach(attachView);
+
+
+
+    // ===== LIKE COMMENTAIRES =====
+    if (!window.likeHandlerAttached) { // évite double attachement
+        window.likeHandlerAttached = true;
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('like-btn')) return;
+
+            const btn = e.target;
+            const meta = btn.closest('.comment-meta');
+            const likesSpan = meta.querySelector('.likes');
+            const commentId = btn.dataset.id;
+
+            if (!commentId) {
+                let likes = parseInt(btn.dataset.likes || 0) + 1;
+                btn.dataset.likes = likes;
+                likesSpan.textContent = "Likes : " + likes;
+                btn.disabled = true;
+                btn.textContent = "👍 Liké";
+                return;
+            }
+
+            fetch(`/commentaire/like/${commentId}`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                likesSpan.textContent = "Likes : " + data.likes;
+                btn.disabled = true;
+                btn.textContent = "👍 Liké";
+            })
+            .catch(() => alert("Erreur lors du like"));
+        });
+    }
+
+});
+</script>
+
+{% endblock %}
+
+{% endblock %}

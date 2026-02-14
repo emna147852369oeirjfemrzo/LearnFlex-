@@ -1,0 +1,288 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion du Forum{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
+
+<style>
+/* Styles spécifiques pour la page publication */
+.dashboard-content {
+    padding: 30px;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px 10px 0 0 !important;
+    padding: 1rem 1.5rem;
+}
+
+.card-header h5 {
+    margin: 0;
+}
+
+.btn-group .btn {
+    border-radius: 6px !important;
+    margin: 0 2px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.badge {
+    font-size: 0.85em;
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+.form-control, .form-select {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+
+    {# MÊME SIDEBAR QUE LE FICHIER COMMUNICATION #}
+    {% include 'back/sidebar.html.twig' %}
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Gestion du Forum</h1>
+                <p>Gérer les publications et réclamations des étudiants</p>
+            </div>
+            <div class="header-right">
+                <div class="search-bar">
+                    <input type="text" placeholder="Rechercher...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+            </div>
+        </header>
+        
+        <div class="dashboard-content">
+            {# VOTRE CONTENU PUBLICATION ICI - ÇA RESTE LE MÊME #}
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 mb-0">Publications</h2>
+                <div>
+                    <a href="{{ path('back_publication_stats') }}" class="btn btn-info me-2">
+                        <i class="fas fa-chart-bar"></i> Statistiques
+                    </a>
+                    <a href="{{ path('back_publication_new') }}" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i> Nouvelle Publication
+                    </a>
+                </div>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {# FORMULAIRE DE RECHERCHE #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search"></i> Recherche avancée
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{{ path('back_publication_index') }}" id="searchForm">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label for="id" class="form-label">ID</label>
+                                <input type="number" class="form-control" id="id" name="id" placeholder="ID" value="{{ searchParams.id ?? '' }}">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="titre" class="form-label">Titre</label>
+                                <input type="text" class="form-control" id="titre" name="titre" placeholder="Rechercher..." value="{{ searchParams.titre ?? '' }}">
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label for="categorie" class="form-label">Catégorie</label>
+                                <select class="form-control" id="categorie" name="categorie">
+                                    <option value="">-- Toutes --</option>
+                                    <option value="question_cours" {{ searchParams.categorie == 'question_cours' ? 'selected' : '' }}>Question cours</option>
+                                    <option value="question_examen" {{ searchParams.categorie == 'question_examen' ? 'selected' : '' }}>Question examen</option>
+                                    <option value="reclamation" {{ searchParams.categorie == 'reclamation' ? 'selected' : '' }}>Réclamation</option>
+                                    <option value="aide" {{ searchParams.categorie == 'aide' ? 'selected' : '' }}>Aide</option>
+                                    <option value="autre" {{ searchParams.categorie == 'autre' ? 'selected' : '' }}>Autre</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label for="dateDebut" class="form-label">Date début</label>
+                                <input type="date" class="form-control" id="dateDebut" name="dateDebut" value="{{ searchParams.dateDebut ?? '' }}">
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label for="dateFin" class="form-label">Date fin</label>
+                                <input type="date" class="form-control" id="dateFin" name="dateFin" value="{{ searchParams.dateFin ?? '' }}">
+                            </div>
+                            
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <a href="{{ path('back_publication_index') }}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-redo"></i> Réinitialiser
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" id="exportPdfBtn">
+                                    <i class="fas fa-file-pdf"></i> Exporter PDF
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# TRI #}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <strong><i class="fas fa-sort"></i> Trier par :</strong>
+                            <div class="btn-group ms-2" role="group">
+                                <a href="{{ path('back_publication_index', searchParams|merge({sortBy: 'dateCreation', sortOrder: 'DESC'})) }}" 
+                                   class="btn btn-sm {{ searchParams.sortBy == 'dateCreation' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                    Date
+                                </a>
+                                <a href="{{ path('back_publication_index', searchParams|merge({sortBy: 'nombreVues', sortOrder: 'DESC'})) }}" 
+                                   class="btn btn-sm {{ searchParams.sortBy == 'nombreVues' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                    Vues
+                                </a>
+                                <a href="{{ path('back_publication_index', searchParams|merge({sortBy: 'nombreLikes', sortOrder: 'DESC'})) }}" 
+                                   class="btn btn-sm {{ searchParams.sortBy == 'nombreLikes' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                    Likes
+                                </a>
+                                <a href="{{ path('back_publication_index', searchParams|merge({sortBy: 'titre', sortOrder: 'ASC'})) }}" 
+                                   class="btn btn-sm {{ searchParams.sortBy == 'titre' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                    Titre
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge bg-secondary fs-6">{{ publications|length }} résultat(s)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# TABLEAU #}
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titre</th>
+                                    <th>Catégorie</th>
+                                    <th>Date</th>
+                                    <th>Vues</th>
+                                    <th>Likes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for publication in publications %}
+                                <tr>
+                                    <td><strong>#{{ publication.id }}</strong></td>
+                                    <td>{{ publication.titre }}</td>
+                                    <td><span class="badge bg-info text-dark">{{ publication.categorie }}</span></td>
+                                    <td>{{ publication.dateCreation|date('d/m/Y H:i') }}</td>
+                                    <td><span class="badge bg-primary">{{ publication.nombreVues }}</span></td>
+                                    <td><span class="badge bg-success">{{ publication.nombreLikes }}</span></td>
+                                    <td>
+                                        <a href="{{ path('back_publication_show', {id: publication.id}) }}" class="btn btn-sm btn-info" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('back_publication_edit', {id: publication.id}) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('back_publication_delete', {id: publication.id}) }}" style="display:inline-block;" onsubmit="return confirm('Supprimer ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ publication.id) }}">
+                                            <button class="btn btn-sm btn-danger" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                                        <p>Aucune publication trouvée</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar Toggle
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    if(sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+    }
+
+    // Export PDF
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    if(exportPdfBtn) {
+        exportPdfBtn.addEventListener('click', function() {
+            const form = document.getElementById('searchForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
+            window.location.href = '{{ path('back_publication_export_pdf') }}?' + params.toString();
+        });
+    }
+});
+</script>
+{% endblock %}

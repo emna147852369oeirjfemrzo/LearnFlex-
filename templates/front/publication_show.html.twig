@@ -1,0 +1,240 @@
+{% extends 'front/home.html.twig' %}
+
+{% block title %}{{ publication.titre }} - LearnFlex+{% endblock %}
+
+{% block header %}
+<header class="landing-header">
+    <div class="container">
+        <div class="header-left">
+            <div class="logo">
+                <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="main-logo">
+                <span class="logo-text">LearnFlex +</span>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="{{ path('app_front') }}">Accueil</a></li>
+                <li class="active"><a href="{{ path('forum_index') }}">Forum</a></li>
+                <li><a href="{{ path('forum_communication_index') }}">Communications</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <a href="#" class="btn btn-primary">Connexion</a>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+.publication-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+}
+
+.publication-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    margin-right: 1rem;
+    color: white;
+}
+
+.communication-item {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.communication-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.badge-live {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.badge-record {
+    background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+{# Header de la publication #}
+<div class="publication-header">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb text-white-50">
+                <li class="breadcrumb-item"><a href="{{ path('app_front') }}" class="text-white">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('forum_index') }}" class="text-white">Forum</a></li>
+                <li class="breadcrumb-item active text-white">{{ publication.titre }}</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-bold mb-3">{{ publication.titre }}</h1>
+        <div class="d-flex gap-3 flex-wrap">
+            <div class="stat-badge">
+                <i class="fas fa-calendar"></i>
+                <span>{{ publication.dateCreation|date('d/m/Y à H:i') }}</span>
+            </div>
+            <div class="stat-badge">
+                <i class="fas fa-eye"></i>
+                <span>{{ publication.nombreVues }} vues</span>
+            </div>
+            <div class="stat-badge">
+                <i class="fas fa-heart"></i>
+                <span>{{ publication.nombreLikes }} likes</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            {# Contenu de la publication #}
+            <div class="publication-card">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <h3 class="text-dark">Description</h3>
+                    <span class="badge bg-info fs-6">{{ publication.categorie }}</span>
+                </div>
+                <p class="lead text-dark">{{ publication.description }}</p>
+            </div>
+
+            {# Communications liées #}
+            {% if communications|length > 0 %}
+            <div class="publication-card">
+                <h3 class="mb-4 text-dark">
+                    <i class="fas fa-video me-2"></i>
+                    Communications associées
+                </h3>
+                
+                {% for communication in communications %}
+                <div class="communication-item">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            {% if communication.type == 'live' %}
+                                <span class="badge-live">
+                                    <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>
+                                    Live
+                                </span>
+                            {% else %}
+                                <span class="badge-record">
+                                    <i class="fas fa-play-circle me-1"></i>
+                                    Enregistré
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if communication.etat == 'programmee' %}
+                                <span class="badge bg-info">Programmée</span>
+                            {% elseif communication.etat == 'en_cours' %}
+                                <span class="badge bg-warning">En cours</span>
+                            {% elseif communication.etat == 'terminee' %}
+                                <span class="badge bg-success">Terminée</span>
+                            {% else %}
+                                <span class="badge bg-danger">Annulée</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 text-dark">
+                        <div class="text-muted mb-2">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            {{ communication.dateHeure|date('d/m/Y à H:i') }}
+                            {% if communication.duree %}
+                                <span class="ms-3">
+                                    <i class="fas fa-clock me-2"></i>
+                                    {{ communication.duree }} minutes
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if communication.descriptionDetaillee %}
+                        <p class="mb-0">{{ communication.descriptionDetaillee }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    {% if communication.lien %}
+                    <a href="{{ communication.lien }}" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt me-2"></i>
+                        Rejoindre la communication
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            {# Sidebar #}
+            <div class="publication-card">
+                <h5 class="mb-3 text-dark">Actions</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ path('forum_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Retour au forum
+                    </a>
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-share-alt me-2"></i>
+                        Partager
+                    </button>
+                    <button class="btn btn-outline-danger">
+                        <i class="fas fa-heart me-2"></i>
+                        J'aime
+                    </button>
+                </div>
+            </div>
+            
+            <div class="publication-card">
+                <h5 class="mb-3 text-dark">Informations</h5>
+                <ul class="list-unstyled text-dark">
+                    <li class="mb-2">
+                        <strong>ID:</strong> #{{ publication.id }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Catégorie:</strong> {{ publication.categorie }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Date de création:</strong> {{ publication.dateCreation|date('d/m/Y') }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Vues:</strong> {{ publication.nombreVues }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Likes:</strong> {{ publication.nombreLikes }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

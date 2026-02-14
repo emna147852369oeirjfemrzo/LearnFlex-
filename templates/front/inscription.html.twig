@@ -1,0 +1,335 @@
+{# templates/front/inscription.html.twig - Formulaire d'inscription événement #}
+
+{% extends 'front/home.html.twig' %}
+
+{% block title %}Inscription - {{ evenement.titre }} | Learnflexplus{% endblock %}
+
+
+
+{% block header %}
+<header class="landing-header">
+    <div class="container">
+        <div class="header-left">
+            <div class="logo">
+                {# Logo clickable for Admin and Enseignant only #}
+                {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                    <a href="{{ path('dashboard') }}">
+                        <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                        <span class="logo-text">LearnFlexPlus</span>
+                    </a>
+                {% else %}
+                    <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                    <span class="logo-text">LearnFlexPlus</span>
+                {% endif %}
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li class="active"><a href="{{ path('app_front') }}">Accueil</a></li>
+                <li><a href="#">Contenus pédagogiques</a></li>
+                <li><a href="{{path('front_evaluation')}}">Evaluation</a></li>
+                <li><a href="#">Questionnaire</a></li>
+                <li><a href="{{ path('front_evenements') }}">Orientation</a></li>
+                <li><a href="#">Forum </a></li>
+            </ul>
+        </nav>
+        
+       <div class="header-right">
+            {# Dashboard button now optional, you can even remove it if logo is enough #}
+            {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                <a href="{{ path('dashboard') }}" class="btn btn-outline dashboard-btn">Dashboard</a>
+            {% endif %}
+
+            {# Logout for logged-in users #}
+            {% if app.user %}
+                <form action="{{ path('app_logout') }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-primary logout-btn">Déconnexion</button>
+                </form>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
+            {% endif %}
+
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block body %}
+<section class="inscription-section">
+    <div class="inscription-container">
+        <a href="{{ path('front_evenement_show', {'id': evenement.id}) }}" class="inscription-back-link">
+            <i class="fas fa-arrow-left"></i> Retour aux détails de l'événement
+        </a>
+
+        <div class="inscription-hero">
+            <span class="inscription-badge"><i class="fas fa-user-plus"></i> Inscription</span>
+            <h1>{{ evenement.titre }}</h1>
+            <p class="inscription-subtitle">Complétez le formulaire ci-dessous pour vous inscrire à cet événement</p>
+        </div>
+
+        <div class="inscription-card">
+            {{ form_start(form, {'attr': {'class': 'inscription-form'}}) }}
+
+            <div class="form-field">
+                {{ form_label(form.nom) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-input', 'placeholder': 'Votre nom complet'}}) }}
+                {{ form_errors(form.nom) }}
+            </div>
+
+            <div class="form-field">
+                {{ form_label(form.email) }}
+                {{ form_widget(form.email, {'attr': {'class': 'form-input', 'placeholder': 'votre@email.com'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="form-actions">
+                {{ form_widget(form.submit, {'attr': {'class': 'btn-inscription-submit'}, 'label': "S'inscrire"}) }}
+                <a href="{{ path('front_evenements') }}" class="btn-inscription-cancel">Annuler</a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Palette front : #0d6efd, #e8f4fd, #1a1a2e, #5a5a72 */
+    .inscription-section {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 40px 20px 80px;
+    }
+
+    .inscription-container {
+        max-width: 560px;
+        margin: 0 auto;
+    }
+
+    .inscription-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #e8f4fd;
+        color: #0d6efd;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 24px;
+        transition: all 0.2s ease;
+    }
+
+    .inscription-back-link:hover {
+        background: #d4e8f7;
+        color: #0a58ca;
+    }
+
+    .inscription-hero {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .inscription-badge {
+        display: inline-block;
+        background: #e8f4fd;
+        color: #0d6efd;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .inscription-hero h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0 0 8px;
+    }
+
+    .inscription-subtitle {
+        font-size: 1rem;
+        color: #5a5a72;
+        margin: 0;
+    }
+
+    .inscription-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        padding: 40px;
+    }
+
+    .inscription-form .form-field {
+        margin-bottom: 24px;
+    }
+
+    .inscription-form .form-field label {
+        display: block;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .inscription-form .form-input {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        color: #1a1a2e;
+        background: #f8f9fa;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .inscription-form .form-input:focus {
+        outline: none;
+        border-color: #0d6efd;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+    }
+
+    .inscription-form .form-input::placeholder {
+        color: #adb5bd;
+    }
+
+    .inscription-form .form-field ul {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0;
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+        flex-wrap: wrap;
+    }
+
+    .form-actions .btn-inscription-submit,
+    .form-actions button[type="submit"] {
+        flex: 1;
+        min-width: 140px;
+        padding: 14px 24px;
+        background: #0d6efd;
+        color: #fff !important;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .form-actions .btn-inscription-submit:hover,
+    .form-actions button[type="submit"]:hover {
+        background: #0a58ca;
+    }
+
+    .btn-inscription-cancel {
+        padding: 14px 24px;
+        background: #fff;
+        color: #5a5a72;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-inscription-cancel:hover {
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    @media (max-width: 576px) {
+        .inscription-card {
+            padding: 24px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn-inscription-submit,
+        .form-actions button[type="submit"] {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block footer %}
+<footer class="main-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlex+ Logo" class="footer-logo-img">
+        <span>LearnFlex+</span>
+      </div>
+      <div class="footer-slogan">
+        <p>Apprends malin, ton bac en main</p>
+      </div>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-middle">
+      <div class="footer-column">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#">Cours</a></li>
+          <li><a href="#">Quiz & Evaluations</a></li>
+          <li><a href="#">Forum</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>À propos</h4>
+        <ul>
+          <li><a href="#">Notre mission</a></li>
+          <li><a href="{{ path('front_evenements') }}">Orientation</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Légal</h4>
+        <ul>
+          <li><a href="#">Conditions d'utilisation</a></li>
+          <li><a href="#">Politique de confidentialité</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Contact</h4>
+        <ul>
+          <li><i class="fas fa-map-marker-alt"></i> 123 Avenue Habib Bourguiba, Tunis</li>
+          <li><i class="fas fa-phone"></i> +216 71 123 456</li>
+          <li><i class="fas fa-envelope"></i> contact@learnflexplus.com</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 LearnFlex+. Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+    document.querySelector('.main-nav').classList.toggle('active');
+  });
+</script>
+{% endblock %}

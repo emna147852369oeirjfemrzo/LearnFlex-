@@ -1,0 +1,212 @@
+{% extends 'front/home.html.twig' %}
+
+{% block title %}Communications - LearnFlex+{% endblock %}
+
+{% block header %}
+<header class="landing-header">
+    <div class="container">
+        <div class="header-left">
+            <div class="logo">
+                <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="main-logo">
+                <span class="logo-text">LearnFlex +</span>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="{{ path('app_front') }}">Accueil</a></li>
+                <li><a href="{{ path('forum_index') }}">Forum</a></li>
+                <li class="active"><a href="{{ path('forum_communication_index') }}">Communications</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <a href="#" class="btn btn-primary">Connexion</a>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+}
+
+.communication-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.communication-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.badge-live {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.badge-record {
+    background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.badge-programmee {
+    background: linear-gradient(135deg, #20c997 0%, #0fb981 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb text-white-50">
+                <li class="breadcrumb-item"><a href="{{ path('app_front') }}" class="text-white">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('forum_index') }}" class="text-white">Forum</a></li>
+                <li class="breadcrumb-item active text-white">Communications</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-bold">Communications</h1>
+        <p class="lead">Sessions live et enregistrées pour interagir avec la communauté</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark">Toutes les communications</h2>
+        <a href="{{ path('forum_communication_new') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle me-2"></i>
+            Nouvelle Communication
+        </a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        {% for communication in communications %}
+        <div class="col-lg-6">
+            <div class="communication-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        {% if communication.type == 'live' %}
+                            <span class="badge-live">
+                                <i class="fas fa-circle me-1" style="font-size: 0.6rem; animation: pulse 1.5s infinite;"></i>
+                                Live
+                            </span>
+                        {% else %}
+                            <span class="badge-record">
+                                <i class="fas fa-play-circle me-1"></i>
+                                Enregistré
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if communication.etat == 'programmee' %}
+                            <span class="badge-programmee">
+                                <i class="fas fa-calendar-check me-1"></i>
+                                Programmée
+                            </span>
+                        {% elseif communication.etat == 'en_cours' %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-hourglass-half me-1"></i>
+                                En cours
+                            </span>
+                        {% elseif communication.etat == 'terminee' %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Terminée
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-times-circle me-1"></i>
+                                Annulée
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-dark mb-2">
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                        <strong>{{ communication.dateHeure|date('d/m/Y à H:i') }}</strong>
+                    </div>
+                    
+                    {% if communication.duree %}
+                    <div class="text-muted mb-2">
+                        <i class="fas fa-clock me-2"></i>
+                        Durée : {{ communication.duree }} minutes
+                    </div>
+                    {% endif %}
+
+                    {% if communication.getPublication() %}
+                    <div class="text-muted mb-2">
+                        <i class="fas fa-link me-2"></i>
+                        Publication : 
+                        <a href="{{ path('forum_publication_show', {id: communication.getPublication().id}) }}" class="text-decoration-none">
+                            {{ communication.getPublication().titre }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if communication.descriptionDetaillee %}
+                    <p class="text-dark mt-3">{{ communication.descriptionDetaillee }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-2">
+                    {% if communication.lien %}
+                    <a href="{{ communication.lien }}" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt me-2"></i>
+                        Rejoindre
+                    </a>
+                    {% endif %}
+                    <a href="{{ path('forum_communication_show', {id: communication.id}) }}" class="btn btn-outline-info">
+                        <i class="fas fa-eye me-2"></i>
+                        Détails
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-video fa-4x text-muted mb-4"></i>
+                <h3 class="text-muted">Aucune communication disponible</h3>
+                <p class="text-muted">Les communications apparaîtront ici</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

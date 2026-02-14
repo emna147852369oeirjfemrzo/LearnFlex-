@@ -9,6 +9,7 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
@@ -16,5 +17,8 @@
 
 ###> symfony/asset-mapper ###
 /public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
 /assets/vendor/
 ###< symfony/asset-mapper ###

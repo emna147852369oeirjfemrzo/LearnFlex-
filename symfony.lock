@@ -50,6 +50,7 @@
             "./bin/phpunit"
         ]
     },
+
     "symfony/asset-mapper": {
         "version": "6.4",
         "recipe": {
@@ -89,6 +90,7 @@
             "./config/packages/debug.yaml"
         ]
     },
+
     "symfony/flex": {
         "version": "2.10",
         "recipe": {
@@ -135,6 +137,7 @@
     },
     "symfony/maker-bundle": {
         "version": "1.66",
+
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -178,6 +181,7 @@
             "./config/packages/notifier.yaml"
         ]
     },
+
     "symfony/routing": {
         "version": "6.4",
         "recipe": {
@@ -244,6 +248,7 @@
             "./templates/base.html.twig"
         ]
     },
+ 
     "symfony/ux-turbo": {
         "version": "2.32",
         "recipe": {

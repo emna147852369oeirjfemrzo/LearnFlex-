@@ -7,30 +7,47 @@
     <div class="container">
         <div class="header-left">
             <div class="logo">
-                <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflexplus Logo" class="main-logo">
-                <span class="logo-text">LearnFlex +</span>
+
+                {# Logo clickable for Admin and Enseignant only #}
+                {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                    <a href="{{ path('dashboard') }}">
+                        <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                        <span class="logo-text">LearnFlexPlus</span>
+                    </a>
+                {% else %}
+                    <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
+                    <span class="logo-text">LearnFlexPlus</span>
+                {% endif %}
             </div>
         </div>
+
         <nav class="main-nav">
             <ul>
-                <li class="active"><a href="#">Accueil</a></li>
+                <li class="active"><a href="{{ path('app_front') }}">Accueil</a></li>
                 <li><a href="#">Contenus pédagogiques</a></li>
                 <li><a href="#">Evaluation</a></li>
                 <li><a href="#">Questionnaire</a></li>
                 <li><a href="#">Orientation</a></li>
-                
+
                 <li><a href="#">Forum</a></li>
             </ul>
         </nav>
+
         <div class="header-right">
-            {% if app.user and app.user.type != 'client' %}
-                <a href="#" class="btn btn-outline dashboard-btn">Dashboard</a>
+            {# Dashboard button now optional, you can even remove it if logo is enough #}
+            {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
+                <a href="{{ path('dashboard') }}" class="btn btn-outline dashboard-btn">Dashboard</a>
             {% endif %}
+
+            {# Logout for logged-in users #}
             {% if app.user %}
-                <a href="#" class="btn btn-primary logout-btn">Déconnexion</a>
+                <form action="{{ path('app_logout') }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-primary logout-btn">Déconnexion</button>
+                </form>
             {% else %}
-                <a href="#" class="btn btn-primary">Connexion</a>
+                <a href="{{ path('app_login') }}" class="btn btn-primary">Connexion</a>
             {% endif %}
+
             <button class="mobile-menu-btn">
                 <i class="fas fa-bars"></i>
             </button>
@@ -48,6 +65,7 @@
 <h1>Apprends malin ,Ton bac en main.</h1>
         <p>
   LearnFlex+ aide les élèves du bac avec des cours interactifs, des quiz et un accompagnement intelligent.
+
 </p>
 
           <div class="hero-buttons">
@@ -101,6 +119,7 @@
         <div class="section-header">
           <span class="badge">Nos avantages</span>
           <h2>Pourquoi choisir LearnFlex+ ?</h2>
+
       <p>Des outils et contenus conçus pour réussir ton bac facilement et efficacement.</p>
         </div>
         <div class="benefits-grid">
@@ -184,6 +203,7 @@
       </div>
       <div class="service-image">
         <img src="{{ asset('assets/images/cours-service.jpg') }}" alt="Cours LearnFlex+">
+
       </div>
     </div>
 
@@ -191,6 +211,8 @@
     <div class="service-item reverse">
       <div class="service-image">
         <img src="{{ asset('assets/images/quiz-service.jpg') }}" alt="Quiz LearnFlex+">
+        <img src="{{ asset('assets/images/quiz-service.jpg') }}" alt="Quiz LearnFlexPlus">
+>>>>>>> origin/user
       </div>
       <div class="service-content">
         <span class="badge">Quiz & Evaluations</span>
@@ -215,7 +237,9 @@
         </a>
       </div>
       <div class="service-image">
+
         <img src="{{ asset('assets/images/forum-service.jpg') }}" alt="Forum LearnFlex+">
+
       </div>
     </div>
   </div>
@@ -228,8 +252,10 @@
   <div class="container">
     <div class="footer-top">
       <div class="footer-logo">
+
         <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlex+ Logo" class="footer-logo-img">
         <span>LearnFlex+</span>
+
       </div>
       <div class="footer-slogan">
         <p>Apprends malin, ton bac en main</p>
@@ -277,7 +303,9 @@
     </div>
 
     <div class="footer-bottom">
+
       <p>&copy; 2026 LearnFlex+. Tous droits réservés.</p>
+
     </div>
   </div>
 </footer>
@@ -291,3 +319,4 @@
 {% endblock %}
 
 {% endblock %}
+

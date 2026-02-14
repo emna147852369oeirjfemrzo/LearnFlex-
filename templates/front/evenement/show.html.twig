@@ -1,0 +1,388 @@
+{# templates/front/evenement/show.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ evenement.titre }} - LearnFlex+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+
+<div class="event-show-page">
+    <!-- Hero Section -->
+    <section class="event-hero">
+        <div class="container">
+            <a href="{{ path('front_evenements') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Retour aux événements
+            </a>
+            <h1>{{ evenement.titre }}</h1>
+            <p class="subtitle">Découvrez tous les détails de cet événement</p>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="event-content">
+        <div class="container">
+            <div class="event-grid">
+                <!-- Main Content -->
+                <div class="event-main">
+                    <div class="event-card">
+
+                        <!-- À propos -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-info-circle"></i> À propos</h2>
+                            <p class="description">{{ evenement.description }}</p>
+                        </div>
+
+                        <!-- Dates & Horaires -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-calendar-alt"></i> Dates & Horaires</h2>
+                            <div class="details-grid">
+                                <div class="detail-box">
+                                    <span class="detail-label">Début</span>
+                                    <span class="detail-value">{{ evenement.datedebut ? evenement.datedebut|date('d/m/Y H:i') : '-' }}</span>
+                                </div>
+                                <div class="detail-box">
+                                    <span class="detail-label">Fin</span>
+                                    <span class="detail-value">{{ evenement.datefin ? evenement.datefin|date('d/m/Y H:i') : '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Localisation -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-map-marker-alt"></i> Localisation</h2>
+                            <p><strong>Lieu :</strong> {{ evenement.lieu }}</p>
+                        </div>
+
+                        <!-- Détails -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-tag"></i> Détails</h2>
+                            <div class="details-grid">
+                                <div class="detail-box">
+                                    <span class="detail-label">Mode</span>
+                                    <span class="detail-value"><span class="badge-mode">{{ evenement.mode }}</span></span>
+                                </div>
+                                <div class="detail-box">
+                                    <span class="detail-label">Capacité</span>
+                                    <span class="detail-value">{{ evenement.capacitemax }} places</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Audience -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-users"></i> Audience</h2>
+                            <p><strong>Public cible :</strong> {{ evenement.publiccible }}</p>
+                        </div>
+
+                        <!-- Contact -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-address-card"></i> Contact</h2>
+                            <div class="contact-info">
+                                <p><i class="fas fa-envelope"></i> <strong>Email :</strong> <a href="mailto:{{ evenement.contactemail }}">{{ evenement.contactemail }}</a></p>
+                                <p><i class="fas fa-phone"></i> <strong>Téléphone :</strong> {{ evenement.contacttelephone }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Organisme -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-building"></i> Organisme</h2>
+                            <p>
+                                {% if evenement.organisme %}
+                                    <strong>{{ evenement.organisme.nom }}</strong>
+                                {% else %}
+                                    <em>Organisme non spécifié</em>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Inscription -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-check-circle"></i> Inscription</h2>
+                            {% if evenement.lieninscription %}
+                                <a href="{{ evenement.lieninscription }}" target="_blank" class="btn btn-primary btn-block">
+                                    <i class="fas fa-link"></i> Lien d'inscription
+                                </a>
+                            {% else %}
+                                <p>Pas de lien d'inscription disponible pour le moment.</p>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="event-sidebar">
+                    <div class="sidebar-card">
+                        <div class="card-badge">{{ evenement.mode }}</div>
+                        <h3>Prêt à vous inscrire ?</h3>
+                        <p>Rejoignez cet événement via le lien d'inscription ci-dessus.</p>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>Informations rapides</h3>
+                        <ul class="quick-info">
+                            <li><strong>Date début :</strong> {{ evenement.datedebut ? evenement.datedebut|date('d/m/Y') : '-' }}</li>
+                            <li><strong>Date fin :</strong> {{ evenement.datefin ? evenement.datefin|date('d/m/Y') : '-' }}</li>
+                            <li><strong>Lieu :</strong> {{ evenement.lieu }}</li>
+                            <li><strong>Capacité :</strong> {{ evenement.capacitemax }}</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.event-show-page {
+    background: #f5f7fa;
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+.event-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.event-hero h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 20px 0 10px 0;
+}
+
+.event-hero .subtitle {
+    font-size: 18px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.back-link {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    transition: opacity 0.3s;
+}
+
+.back-link:hover {
+    opacity: 0.8;
+}
+
+.event-content {
+    padding: 40px 0;
+}
+
+.event-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+.event-main .event-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.event-section {
+    padding: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.event-section:last-child {
+    border-bottom: none;
+}
+
+.event-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 20px 0;
+}
+
+.event-section h2 i {
+    color: #667eea;
+    margin-right: 10px;
+}
+
+.description {
+    line-height: 1.8;
+    color: #555;
+    font-size: 15px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.detail-box {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+}
+
+.detail-label {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.badge-mode {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.contact-info p {
+    margin: 12px 0;
+    font-size: 14px;
+}
+
+.contact-info i {
+    color: #667eea;
+    margin-right: 8px;
+}
+
+.contact-info a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.contact-info a:hover {
+    text-decoration: underline;
+}
+
+/* Sidebar */
+.event-sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.sidebar-card h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.card-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.sidebar-card p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+}
+
+.btn-block {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-block:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.quick-info {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.quick-info li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.quick-info li:last-child {
+    border-bottom: none;
+}
+
+.quick-info strong {
+    color: #667eea;
+}
+
+@media (max-width: 1024px) {
+    .event-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .event-hero h1 {
+        font-size: 28px;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-section {
+        padding: 20px;
+    }
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,137 @@
+{# templates/front/organisme_show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'organisme - {{ organisme.nom }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="organisme-card">
+
+        <!-- Header -->
+        <div class="card-header">
+            <h2>{{ organisme.nom }}</h2>
+            {% if organisme.actif is not null %}
+                <span class="status-badge {% if organisme.actif %}active{% else %}inactive{% endif %}">
+                    {{ organisme.actif ? 'Actif' : 'Inactif' }}
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+            {% if organisme.type %}
+                <p><strong>Type :</strong> {{ organisme.type }}</p>
+            {% endif %}
+
+            <p><strong>Description :</strong></p>
+            <p>{{ organisme.description ?: 'Aucune description disponible.' }}</p>
+
+            <div class="organisme-details-grid">
+                <div><strong>Email :</strong> {{ organisme.email ?: '-' }}</div>
+                <div><strong>Téléphone :</strong> {{ organisme.telephone ?: '-' }}</div>
+                <div><strong>Ville :</strong> {{ organisme.ville ?: '-' }}</div>
+                <div><strong>Langue :</strong> {{ organisme.langue ?: '-' }}</div>
+                <div><strong>Frais minimum :</strong> 
+                    {% if organisme.fraismin is not null %}
+                        {{ organisme.fraismin }} DT
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+                <div><strong>Opportunités stage :</strong> {{ organisme.opportunitesstage ? 'Oui' : 'Non' }}</div>
+                <div><strong>Opportunités emploi :</strong> {{ organisme.opportunitesemploi ? 'Oui' : 'Non' }}</div>
+                <div><strong>Site web :</strong> 
+                    {% if organisme.siteweb %}
+                        {% set siteUrl = organisme.siteweb starts with 'http://' or organisme.siteweb starts with 'https://' ? organisme.siteweb : 'https://' ~ organisme.siteweb %}
+                        <a href="{{ siteUrl }}" target="_blank">{{ organisme.siteweb }}</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+            <a href="{{ path('front_organismes') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.organisme-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.status-badge.active { background: rgba(76, 175, 80, 0.8); }
+.status-badge.inactive { background: rgba(244, 67, 54, 0.8); }
+
+.card-body {
+    padding: 25px;
+    font-size: 14px;
+    color: #555;
+}
+
+.organisme-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.organisme-details-grid div strong {
+    color: #333;
+}
+
+.card-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+</style>
+{% endblock %}

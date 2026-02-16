@@ -1,0 +1,197 @@
+{# templates/front/organisme_show.html.twig #}
+{% extends 'front/layout_front.html.twig' %}
+
+{% block title %}Détails de l'organisme - {{ organisme.nom }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="organisme-show-page">
+    <section class="organisme-show-hero">
+        <div class="container">
+            <a href="{{ path('front_organismes') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Retour aux organismes
+            </a>
+            <h1><i class="fas fa-building"></i> {{ organisme.nom }}</h1>
+            {% if organisme.actif is not null %}
+                <span class="status-badge-hero {% if organisme.actif %}active{% else %}inactive{% endif %}">
+                    {{ organisme.actif ? 'Actif' : 'Inactif' }}
+                </span>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="organisme-show-content">
+        <div class="container">
+            <div class="organisme-detail-card">
+                {% if organisme.photo %}
+                    <div class="organisme-photo-block">
+                        <img src="{{ asset('uploads/organismes/' ~ organisme.photo) }}" alt="{{ organisme.nom }}">
+                    </div>
+                {% endif %}
+
+                {% if organisme.type %}
+                    <p><strong>Type :</strong> {{ organisme.type }}</p>
+                {% endif %}
+
+                <p><strong>Description :</strong></p>
+                <p>{{ organisme.description ?: 'Aucune description disponible.' }}</p>
+
+                <div class="organisme-details-grid">
+                    <div class="detail-item"><i class="fas fa-envelope"></i> <strong>Email :</strong> {{ organisme.email ?: '-' }}</div>
+                    <div class="detail-item"><i class="fas fa-phone"></i> <strong>Téléphone :</strong> {{ organisme.telephone ?: '-' }}</div>
+                    <div class="detail-item"><i class="fas fa-map-marker-alt"></i> <strong>Ville :</strong> {{ organisme.ville ?: '-' }}</div>
+                    <div class="detail-item"><i class="fas fa-language"></i> <strong>Langue :</strong> {{ organisme.langue ?: '-' }}</div>
+                    <div class="detail-item"><i class="fas fa-coins"></i> <strong>Frais minimum :</strong> {{ organisme.fraismin is not null ? organisme.fraismin ~ ' DT' : '-' }}</div>
+                    <div class="detail-item"><i class="fas fa-briefcase"></i> <strong>Opportunités stage :</strong> {{ organisme.opportunitesstage ? 'Oui' : 'Non' }}</div>
+                    <div class="detail-item"><i class="fas fa-user-tie"></i> <strong>Opportunités emploi :</strong> {{ organisme.opportunitesemploi ? 'Oui' : 'Non' }}</div>
+                    <div class="detail-item"><i class="fas fa-globe"></i> <strong>Site web :</strong>
+                        {% if organisme.siteweb %}
+                            {% set siteUrl = organisme.siteweb starts with 'http://' or organisme.siteweb starts with 'https://' ? organisme.siteweb : 'https://' ~ organisme.siteweb %}
+                            <a href="{{ siteUrl }}" target="_blank">{{ organisme.siteweb }}</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <a href="{{ path('front_organismes') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                    {% if organisme.siteweb %}
+                        {% set siteUrl = organisme.siteweb starts with 'http://' or organisme.siteweb starts with 'https://' ? organisme.siteweb : 'https://' ~ organisme.siteweb %}
+                        <a href="{{ siteUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                            <i class="fas fa-external-link-alt"></i> Visiter le site
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+/* Palette front : #97c3a2 (primary), #1f4f65 (secondary) */
+.organisme-show-page {
+    background: var(--background, #f8f9fa);
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.organisme-show-hero {
+    background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+    color: white;
+    padding: 50px 0 60px;
+    box-shadow: 0 8px 32px rgba(31, 79, 101, 0.2);
+    position: relative;
+}
+
+.organisme-show-hero h1 {
+    font-size: 38px;
+    font-weight: 700;
+    margin: 16px 0 10px 0;
+}
+
+.back-link {
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    transition: all 0.3s;
+}
+.back-link:hover {
+    color: white;
+    transform: translateX(-4px);
+}
+
+.status-badge-hero {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.25);
+}
+.status-badge-hero.active { background: rgba(76, 175, 80, 0.9); }
+.status-badge-hero.inactive { background: rgba(244, 67, 54, 0.8); }
+
+.organisme-show-content {
+    padding: 0 0 50px;
+    margin-top: -24px;
+}
+
+.organisme-detail-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    border: 1px solid rgba(151, 195, 162, 0.2);
+    padding: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.organisme-photo-block {
+    width: 100%;
+    max-height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.organisme-photo-block img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.organisme-detail-card p {
+    margin-bottom: 16px;
+    color: #555;
+}
+
+.organisme-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.detail-item {
+    padding: 16px;
+    background: linear-gradient(135deg, #f8faf9 0%, #f0f7f2 100%);
+    border-radius: 12px;
+    border-left: 4px solid #97c3a2;
+    font-size: 14px;
+}
+.detail-item i {
+    color: #1f4f65;
+    margin-right: 8px;
+}
+.detail-item a {
+    color: #1f4f65;
+    font-weight: 600;
+}
+.detail-item a:hover {
+    text-decoration: underline;
+}
+
+.card-footer {
+    padding-top: 24px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .organisme-show-hero h1 { font-size: 26px; }
+    .organisme-details-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}

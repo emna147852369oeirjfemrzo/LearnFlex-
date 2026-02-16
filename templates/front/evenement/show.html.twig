@@ -1,0 +1,454 @@
+{# templates/front/evenement/show.html.twig #}
+
+{% extends 'front/layout_front.html.twig' %}
+
+{% block title %}{{ evenement.titre }} - LearnFlex+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+
+<div class="event-show-page">
+    <!-- Hero Section -->
+    <section class="event-hero">
+        <div class="container">
+            <a href="{{ path('etudiant_evenements') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Retour aux événements
+            </a>
+            <h1>{{ evenement.titre }}</h1>
+            <p class="subtitle">Découvrez tous les détails de cet événement</p>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="event-content">
+        <div class="container">
+            <div class="event-grid">
+                <!-- Main Content -->
+                <div class="event-main">
+                    <div class="event-card">
+                        <!-- À propos -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-info-circle"></i> À propos</h2>
+                            <p class="description">{{ evenement.description }}</p>
+                        </div>
+
+                        <!-- Dates & Horaires -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-calendar-alt"></i> Dates & Horaires</h2>
+                            <div class="details-grid">
+                                <div class="detail-box">
+                                    <span class="detail-label">Début</span>
+                                    <span class="detail-value">{{ evenement.datedebut ? evenement.datedebut|date('d/m/Y H:i') : '-' }}</span>
+                                </div>
+                                <div class="detail-box">
+                                    <span class="detail-label">Fin</span>
+                                    <span class="detail-value">{{ evenement.datefin ? evenement.datefin|date('d/m/Y H:i') : '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lieu -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-map-marker-alt"></i> Localisation</h2>
+                            <p><strong>Lieu :</strong> {{ evenement.lieu }}</p>
+                        </div>
+
+                        <!-- Détails -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-tag"></i> Détails</h2>
+                            <div class="details-grid">
+                                <div class="detail-box">
+                                    <span class="detail-label">Mode</span>
+                                    <span class="detail-value"><span class="badge-mode">{{ evenement.mode }}</span></span>
+                                </div>
+                                <div class="detail-box">
+                                    <span class="detail-label">Capacité</span>
+                                    <span class="detail-value">{{ evenement.capacitemax }} places</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Audience -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-users"></i> Audience</h2>
+                            <p><strong>Public cible :</strong> {{ evenement.publiccible }}</p>
+                        </div>
+
+                        <!-- Inscription -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-link"></i> Inscription</h2>
+                            {% if evenement.lieninscription %}
+                                <p>Formulaire d'inscription : <a href="{{ evenement.lieninscription }}" target="_blank">{{ evenement.lieninscription }}</a></p>
+                            {% else %}
+                                <p><em>Lien d'inscription non disponible</em></p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Contact -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-address-card"></i> Contact</h2>
+                            <div class="contact-info">
+                                <p><i class="fas fa-envelope"></i> <strong>Email :</strong> <a href="mailto:{{ evenement.contactemail }}">{{ evenement.contactemail }}</a></p>
+                                <p><i class="fas fa-phone"></i> <strong>Téléphone :</strong> {{ evenement.contacttelephone }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Organisme -->
+                        <div class="event-section">
+                            <h2><i class="fas fa-building"></i> Organisme</h2>
+                            <p>
+                                {% if evenement.organisme %}
+                                    <strong>{{ evenement.organisme.nom }}</strong>
+                                {% else %}
+                                    <em>Organisme non spécifié</em>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="event-sidebar">
+                    <div class="sidebar-card">
+                        <h3>Prêt à vous inscrire ?</h3>
+                        {% if evenement.lieninscription %}
+                            <a href="{{ evenement.lieninscription }}" class="btn btn-primary btn-block" target="_blank">
+                                <i class="fas fa-check-circle"></i> S'inscrire maintenant
+                            </a>
+                        {% else %}
+                            <button class="btn btn-primary btn-block" disabled>
+                                Lien d'inscription indisponible
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>Informations rapides</h3>
+                        <ul class="quick-info">
+                            <li><strong>Date :</strong> {{ evenement.datedebut ? evenement.datedebut|date('d/m/Y') : '-' }}</li>
+                            <li><strong>Heure :</strong> {{ evenement.datedebut ? evenement.datedebut|date('H:i') : '-' }}</li>
+                            <li><strong>Lieu :</strong> {{ evenement.lieu }}</li>
+                            <li><strong>Capacité :</strong> {{ evenement.capacitemax }}</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Palette front : #97c3a2 (primary), #1f4f65 (secondary) */
+    .event-show-page {
+        background: var(--background, #f8f9fa);
+        min-height: 100vh;
+        padding-bottom: 60px;
+    }
+
+    .event-hero {
+        background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+        color: white;
+        padding: 50px 0 60px;
+        box-shadow: 0 8px 32px rgba(31, 79, 101, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    .event-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 60%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    }
+
+    .event-hero h1 {
+        font-size: 38px;
+        font-weight: 700;
+        margin: 16px 0 10px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .event-hero .subtitle {
+        font-size: 17px;
+        opacity: 0.92;
+        margin: 0;
+    }
+
+    .back-link {
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        transition: all 0.3s;
+        padding: 8px 0;
+    }
+    .back-link:hover {
+        color: white;
+        transform: translateX(-4px);
+    }
+
+    .event-content {
+        padding: 0 0 50px;
+        margin-top: -24px;
+    }
+    .event-content .container { position: relative; z-index: 2; }
+
+    .event-grid {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 28px;
+    }
+
+    /* Cartes principales - chaque section = carte distincte */
+    .event-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .event-main .event-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        overflow: hidden;
+        border: 1px solid rgba(151, 195, 162, 0.2);
+    }
+
+    .event-section {
+        padding: 28px 32px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background 0.2s;
+    }
+    .event-section:hover {
+        background: linear-gradient(to right, rgba(151, 195, 162, 0.05), transparent);
+    }
+    .event-section:last-child {
+        border-bottom: none;
+    }
+
+    .event-section h2 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0 0 18px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .event-section h2 i {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+        color: white;
+        border-radius: 12px;
+        font-size: 16px;
+    }
+
+    .description {
+        line-height: 1.85;
+        color: #555;
+        font-size: 15px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+    }
+
+    .detail-box {
+        background: linear-gradient(135deg, #f8faf9 0%, #f0f7f2 100%);
+        padding: 18px;
+        border-radius: 12px;
+        border-left: 4px solid #97c3a2;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .detail-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(151, 195, 162, 0.2);
+    }
+
+    .detail-label {
+        display: block;
+        font-size: 11px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .detail-value {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .badge-mode {
+        display: inline-block;
+        padding: 6px 14px;
+        background: rgba(151, 195, 162, 0.25);
+        color: #1f4f65;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .contact-info p {
+        margin: 14px 0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .contact-info p:first-child { margin-top: 0; }
+
+    .contact-info i {
+        color: #1f4f65;
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+    }
+
+    .contact-info a {
+        color: #1f4f65;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .contact-info a:hover {
+        text-decoration: underline;
+    }
+
+    /* Sidebar - cartes modernes */
+    .event-sidebar {
+        position: sticky;
+        top: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .sidebar-card {
+        background: white;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        border: 1px solid rgba(151, 195, 162, 0.2);
+        transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .sidebar-card:hover {
+        box-shadow: 0 8px 32px rgba(31, 79, 101, 0.1);
+    }
+
+    .sidebar-card h3 {
+        margin: 0 0 16px 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+
+    .sidebar-card p {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0 0 22px 0;
+    }
+
+    .btn-block {
+        width: 100%;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 15px;
+        box-shadow: 0 4px 14px rgba(151, 195, 162, 0.4);
+    }
+    .btn-block:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(31, 79, 101, 0.3);
+    }
+    .btn-block:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .quick-info {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .quick-info li {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .quick-info li::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+        border-radius: 50%;
+    }
+    .quick-info li:last-child {
+        border-bottom: none;
+    }
+
+    .quick-info strong {
+        color: #1f4f65;
+        min-width: 70px;
+    }
+
+    @media (max-width: 1024px) {
+        .event-grid {
+            grid-template-columns: 1fr;
+        }
+        .event-sidebar {
+            position: static;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .event-hero h1 {
+            font-size: 26px;
+        }
+        .event-hero .subtitle { font-size: 15px; }
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+        .event-section {
+            padding: 22px 20px;
+        }
+        .event-section h2 i {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+        }
+    }
+</style>
+
+{% endblock %}

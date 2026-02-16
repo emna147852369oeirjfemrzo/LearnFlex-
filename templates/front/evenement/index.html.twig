@@ -1,0 +1,373 @@
+{# templates/front/evenement/index.html.twig #}
+
+{% extends 'front/layout_front.html.twig' %}
+
+{% block title %}{{ title|default('Événements') }} - LearnFlex+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+
+<div class="event-index-page">
+    <!-- Hero (même palette que show) -->
+    <section class="event-index-hero">
+        <div class="container">
+            <a href="{{ path('front_organismes') }}" class="btn-hero-organismes">
+                <i class="fas fa-building"></i> Voir organismes
+            </a>
+            <h1><i class="fas fa-calendar-alt"></i> {{ title|default('Événements disponibles') }}</h1>
+            <p class="hero-subtitle">Découvrez nos événements et formations</p>
+        </div>
+    </section>
+
+    <section class="event-index-content">
+        <div class="container">
+            <div class="events-grid">
+                {% for evenement in evenements %}
+                    <article class="event-card-modern">
+                        <div class="card-header-modern">
+                            <div class="card-type-badge">{{ evenement.typeevenement ?? 'Événement' }}</div>
+                            <h2 class="card-title-modern">{{ evenement.titre }}</h2>
+                        </div>
+
+                        <div class="card-body-modern">
+                            <p class="card-description">{{ evenement.description|slice(0, 120) }}{% if evenement.description|length > 120 %}...{% endif %}</p>
+
+                            <div class="detail-boxes-grid">
+                                <div class="detail-item-modern">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>{{ evenement.datedebut ? evenement.datedebut|date('d/m/Y') : '-' }}</span>
+                                </div>
+                                <div class="detail-item-modern">
+                                    <i class="fas fa-clock"></i>
+                                    <span>{{ evenement.datedebut ? evenement.datedebut|date('H:i') : '-' }}</span>
+                                </div>
+                                <div class="detail-item-modern">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ evenement.lieu }}</span>
+                                </div>
+                                <div class="detail-item-modern">
+                                    <i class="fas fa-users"></i>
+                                    <span>{{ evenement.capacitemax }} places</span>
+                                </div>
+                            </div>
+
+                            {% if evenement.organisme %}
+                                <div class="organisme-pill">
+                                    <i class="fas fa-building"></i>
+                                    <span>{{ evenement.organisme.nom }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer-modern">
+                            <a href="{{ path('etudiant_evenement_show', {'id': evenement.id}) }}" class="btn-modern btn-details">
+                                <i class="fas fa-eye"></i> Voir détails
+                            </a>
+                            {% if evenement.lieninscription %}
+                                <a href="{{ evenement.lieninscription }}" class="btn-modern btn-inscription" target="_blank">
+                                    <i class="fas fa-check-circle"></i> S'inscrire
+                                </a>
+                            {% else %}
+                                <span class="btn-modern btn-disabled" disabled>
+                                    <i class="fas fa-ban"></i> Inscription indisponible
+                                </span>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% else %}
+                    <div class="no-events-modern">
+                        <div class="no-events-icon"><i class="fas fa-calendar-xmark"></i></div>
+                        <h3>Aucun événement disponible</h3>
+                        <p>Consultez-nous plus tard pour découvrir nos prochains événements</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+/* Palette front : #97c3a2 (primary), #1f4f65 (secondary) */
+.event-index-page {
+    background: var(--background, #f8f9fa);
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.event-index-hero {
+    background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+    color: white;
+    padding: 56px 0 64px;
+    box-shadow: 0 8px 32px rgba(31, 79, 101, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+.event-index-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -15%;
+    width: 50%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 65%);
+}
+.event-index-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 40%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+}
+
+.event-index-hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 2;
+}
+.event-index-hero h1 i {
+    margin-right: 14px;
+    opacity: 0.95;
+}
+
+.btn-hero-organismes {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
+}
+.btn-hero-organismes:hover {
+    background: white;
+    color: #1f4f65;
+    border-color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.hero-subtitle {
+    font-size: 17px;
+    opacity: 0.92;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.event-index-content {
+    padding: 0;
+    margin-top: -28px;
+    position: relative;
+    z-index: 3;
+}
+.event-index-content .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 28px;
+}
+
+.event-card-modern {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    border: 1px solid rgba(151, 195, 162, 0.2);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.event-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(31, 79, 101, 0.15);
+    border-color: rgba(151, 195, 162, 0.4);
+}
+
+.card-header-modern {
+    background: linear-gradient(135deg, #f0f7f2 0%, #e8f4ee 100%);
+    padding: 28px 26px;
+    border-bottom: 1px solid rgba(151, 195, 162, 0.15);
+}
+.card-type-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+}
+.card-title-modern {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1.35;
+}
+
+.card-body-modern {
+    padding: 24px 26px;
+    flex: 1;
+}
+.card-description {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+}
+
+.detail-boxes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.detail-item-modern {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #f8faf9 0%, #f0f7f2 100%);
+    border-radius: 12px;
+    border-left: 3px solid #97c3a2;
+    font-size: 13px;
+    color: #444;
+}
+.detail-item-modern i {
+    color: #1f4f65;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.organisme-pill {
+    margin-top: 18px;
+    padding: 10px 14px;
+    background: rgba(151, 195, 162, 0.15);
+    border-radius: 10px;
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.organisme-pill i {
+    color: #1f4f65;
+}
+
+.card-footer-modern {
+    padding: 18px 26px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    gap: 12px;
+}
+.btn-modern {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+.btn-details {
+    background: white;
+    color: #1f4f65;
+    border: 2px solid #97c3a2;
+}
+.btn-details:hover {
+    background: rgba(151, 195, 162, 0.15);
+    transform: translateY(-2px);
+}
+.btn-inscription {
+    background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(151, 195, 162, 0.4);
+}
+.btn-inscription:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(31, 79, 101, 0.3);
+}
+.btn-disabled {
+    background: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.no-events-modern {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+    border: 2px dashed rgba(151, 195, 162, 0.4);
+}
+.no-events-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: rgba(151, 195, 162, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.no-events-icon i {
+    font-size: 36px;
+    color: #1f4f65;
+}
+.no-events-modern h3 {
+    font-size: 1.4rem;
+    color: #1a1a2e;
+    margin: 0 0 10px 0;
+}
+.no-events-modern p {
+    color: #666;
+    font-size: 1rem;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .events-grid {
+        grid-template-columns: 1fr;
+    }
+    .event-index-hero h1 {
+        font-size: 26px;
+    }
+    .detail-boxes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+{% endblock %}

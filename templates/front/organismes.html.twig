@@ -1,0 +1,405 @@
+{# templates/front/organismes.html.twig #}
+
+{% extends 'front/layout_front.html.twig' %}
+
+{% block title %}Organismes - LearnFlex+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+
+<div class="organisme-index-page">
+    <!-- Hero (même palette que événements) -->
+    <section class="organisme-index-hero">
+        <div class="container">
+            <a href="{{ path('etudiant_evenements') }}" class="btn-hero-events">
+                <i class="fas fa-calendar-alt"></i> Voir événements
+            </a>
+            <h1><i class="fas fa-building"></i> Organismes disponibles</h1>
+            <p class="hero-subtitle">Découvrez les établissements et partenaires qui proposent formations et événements</p>
+        </div>
+    </section>
+
+    <section class="organisme-index-content">
+        <div class="container">
+            <div class="organismes-grid-modern">
+                {% for organisme in organismes %}
+                    <article class="organisme-card-modern">
+                        <div class="card-header-modern">
+                            {% if organisme.type %}
+                                <div class="card-type-badge">{{ organisme.type }}</div>
+                            {% endif %}
+                            <h2 class="card-title-modern">{{ organisme.nom }}</h2>
+                        </div>
+
+                        <div class="card-body-modern">
+                            {% if organisme.photo %}
+                                <div class="organisme-photo-modern">
+                                    <img src="{{ asset('uploads/organismes/' ~ organisme.photo) }}" alt="{{ organisme.nom }}">
+                                </div>
+                            {% endif %}
+
+                            {% if organisme.description %}
+                                <p class="card-description">{{ organisme.description|slice(0, 120) }}{% if organisme.description|length > 120 %}...{% endif %}</p>
+                            {% endif %}
+
+                            <div class="detail-boxes-grid">
+                                {% if organisme.ville %}
+                                    <div class="detail-item-modern">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ organisme.ville }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if organisme.langue %}
+                                    <div class="detail-item-modern">
+                                        <i class="fas fa-language"></i>
+                                        <span>{{ organisme.langue }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if organisme.fraismin %}
+                                    <div class="detail-item-modern">
+                                        <i class="fas fa-coins"></i>
+                                        <span>Frais min. {{ organisme.fraismin }} DT</span>
+                                    </div>
+                                {% endif %}
+                                <div class="detail-item-modern">
+                                    <i class="fas fa-circle"></i>
+                                    <span class="organisme-status {% if organisme.actif %}status-actif{% else %}status-inactif{% endif %}">{{ organisme.actif ? 'Actif' : 'Inactif' }}</span>
+                                </div>
+                            </div>
+
+                            {% if organisme.opportunitesstage or organisme.opportunitesemploi %}
+                                <div class="opportunites-pill">
+                                    {% if organisme.opportunitesstage %}<span><i class="fas fa-briefcase"></i> Stage</span>{% endif %}
+                                    {% if organisme.opportunitesemploi %}<span><i class="fas fa-user-tie"></i> Emploi</span>{% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer-modern">
+                            <a href="{{ path('front_organisme_show', {'id': organisme.id}) }}" class="btn-modern btn-details">
+                                <i class="fas fa-eye"></i> Voir détails
+                            </a>
+                            {% set siteUrl = organisme.siteweb and organisme.siteweb|trim != '' ? ((organisme.siteweb starts with 'http://') or (organisme.siteweb starts with 'https://') ? organisme.siteweb : 'https://' ~ organisme.siteweb) : null %}
+                            {% if siteUrl %}
+                                <a href="{{ siteUrl }}" target="_blank" rel="noopener noreferrer" class="btn-modern btn-inscription">
+                                    <i class="fas fa-external-link-alt"></i> Visiter le site
+                                </a>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% else %}
+                    <div class="no-organismes-modern">
+                        <div class="no-organismes-icon"><i class="fas fa-building"></i></div>
+                        <h3>Aucun organisme disponible</h3>
+                        <p>Consultez-nous plus tard pour découvrir nos partenaires</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+/* Palette front : #97c3a2 (primary), #1f4f65 (secondary) */
+.organisme-index-page {
+    background: var(--background, #f8f9fa);
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.organisme-index-hero {
+    background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+    color: white;
+    padding: 56px 0 64px;
+    box-shadow: 0 8px 32px rgba(31, 79, 101, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+.organisme-index-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -15%;
+    width: 50%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 65%);
+}
+.organisme-index-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 40%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+}
+
+.organisme-index-hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 2;
+}
+.organisme-index-hero h1 i {
+    margin-right: 14px;
+    opacity: 0.95;
+}
+.organisme-index-hero .hero-subtitle {
+    font-size: 17px;
+    opacity: 0.92;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-hero-events {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
+}
+.btn-hero-events:hover {
+    background: white;
+    color: #1f4f65;
+    border-color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.organisme-index-content {
+    padding: 0;
+    margin-top: -28px;
+    position: relative;
+    z-index: 3;
+}
+.organisme-index-content .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.organismes-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 28px;
+}
+
+.organisme-card-modern {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    border: 1px solid rgba(151, 195, 162, 0.2);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.organisme-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(31, 79, 101, 0.15);
+    border-color: rgba(151, 195, 162, 0.4);
+}
+
+.organisme-card-modern .card-header-modern {
+    background: linear-gradient(135deg, #f0f7f2 0%, #e8f4ee 100%);
+    padding: 28px 26px;
+    border-bottom: 1px solid rgba(151, 195, 162, 0.15);
+}
+.organisme-card-modern .card-type-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+}
+.organisme-card-modern .card-title-modern {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1.35;
+}
+
+.organisme-card-modern .card-body-modern {
+    padding: 24px 26px;
+    flex: 1;
+}
+
+.organisme-photo-modern {
+    width: 100%;
+    aspect-ratio: 16/10;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 18px;
+}
+.organisme-photo-modern img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.organisme-card-modern .card-description {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+}
+
+.organisme-card-modern .detail-boxes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.organisme-card-modern .detail-item-modern {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #f8faf9 0%, #f0f7f2 100%);
+    border-radius: 12px;
+    border-left: 3px solid #97c3a2;
+    font-size: 13px;
+    color: #444;
+}
+.organisme-card-modern .detail-item-modern i {
+    color: #1f4f65;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.organisme-card-modern .detail-item-modern i.fa-circle {
+    font-size: 8px;
+}
+.status-actif { color: #2e7d32; font-weight: 600; }
+.status-inactif { color: #c62828; font-weight: 600; }
+
+.opportunites-pill {
+    margin-top: 18px;
+    padding: 10px 14px;
+    background: rgba(151, 195, 162, 0.15);
+    border-radius: 10px;
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.opportunites-pill span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.opportunites-pill i {
+    color: #1f4f65;
+}
+
+.organisme-card-modern .card-footer-modern {
+    padding: 18px 26px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    gap: 12px;
+}
+.organisme-card-modern .btn-modern {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+.organisme-card-modern .btn-details {
+    background: white;
+    color: #1f4f65;
+    border: 2px solid #97c3a2;
+}
+.organisme-card-modern .btn-details:hover {
+    background: rgba(151, 195, 162, 0.15);
+    transform: translateY(-2px);
+}
+.organisme-card-modern .btn-inscription {
+    background: linear-gradient(135deg, #97c3a2 0%, #1f4f65 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(151, 195, 162, 0.4);
+}
+.organisme-card-modern .btn-inscription:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(31, 79, 101, 0.3);
+}
+
+.no-organismes-modern {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+    border: 2px dashed rgba(151, 195, 162, 0.4);
+}
+.no-organismes-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: rgba(151, 195, 162, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.no-organismes-icon i {
+    font-size: 36px;
+    color: #1f4f65;
+}
+.no-organismes-modern h3 {
+    font-size: 1.4rem;
+    color: #1a1a2e;
+    margin: 0 0 10px 0;
+}
+.no-organismes-modern p {
+    color: #666;
+    font-size: 1rem;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .organismes-grid-modern {
+        grid-template-columns: 1fr;
+    }
+    .organisme-index-hero h1 {
+        font-size: 26px;
+    }
+    .organisme-card-modern .detail-boxes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+{% endblock %}

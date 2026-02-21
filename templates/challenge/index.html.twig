@@ -101,6 +101,10 @@
                                 <th>Date fin</th>
                                 <th>Date limite</th>
                                 <th>Alerte</th>
+                                <th>Dernier Score</th>
+                                <th>Dernier Niveau</th>
+                                <th>Dernières Réponses</th>
+                                <th>Iteracty</th>
                                 <th>Actions</th>
                                 <th>Image</th>
                             </tr>
@@ -113,7 +117,12 @@
                                     <td>{{ challenge.descriptionc }}</td>
                                     <td>{{ challenge.examen.titre }}</td>
                                     <td>{{ challenge.objectifscore }}</td>
-                                    <td>{{ challenge.question }}</td>
+                                    <td><pre>
+{{ challenge.question is iterable
+    ? challenge.question|json_encode(constant('JSON_PRETTY_PRINT'))
+    : challenge.question }}
+</pre>
+</td>
                                     <td>{{ challenge.progressionactuelle }}</td>
                                     <td>{{ challenge.niveauatteint }}</td>
                                     <td>{{ challenge.typerecomponse }}<br>{{ challenge.contenurecompense }}</td>
@@ -122,6 +131,19 @@
                                     <td>{{ challenge.datef ? challenge.datef|date('d/m/Y') : '-' }}</td>
                                     <td>{{ challenge.datelimite ? challenge.datelimite|date('d/m/Y') : '-' }}</td>
                                     <td>{{ challenge.alerte ? 'Oui' : 'Non' }}</td>
+                                    <td>{{ challenge.dernierScore ?: '-' }}</td>
+<td>{{ challenge.dernierNiveau ?: '-' }}</td>
+<td>
+   {% if challenge.reponses %}
+    {{ challenge.reponses|join(', ') }}
+{% else %}
+    -
+{% endif %}
+
+</td>
+<td>{{ challenge.interactyHash ?: '-' }}</td>
+
+
                                     <td class="actions">
                                         <a href="{{ path('app_edit_challenge', {'id': challenge.id}) }}" class="action-btn edit" title="Modifier"><i class="fas fa-edit"></i></a>
                                         <form method="post" action="{{ path('app_delete_challenge', {'id': challenge.id}) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce challenge ?');">
@@ -129,6 +151,12 @@
                                             <button class="action-btn delete" title="Supprimer"><i class="fas fa-trash"></i></button>
                                         </form>
                                         <a href="{{ path('app_challenge_pdf', {'id': challenge.id}) }}" class="action-btn pdf" title="Télécharger PDF"><i class="fas fa-file-pdf"></i></a>
+                                        <a href="{{ path('challenge_generate_form', {'id': challenge.id}) }}" 
+   class="action-btn" 
+   title="Générer questions IA" 
+   style="background:#6f42c1; color:white;">
+    <i class="fas fa-robot"></i>
+</a>
                                     </td>
                                     <td>
                                         {% if challenge.images %}

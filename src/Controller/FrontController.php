@@ -17,8 +17,10 @@ use App\Entity\Commentaire;
 use App\Entity\ReponseExamen;
 use App\Repository\ReponseExamenRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\MailerInterface;   
+use App\Service\EmailService;
+use App\Entity\Users;
 
 final class FrontController extends AbstractController
 {
@@ -49,8 +51,9 @@ final class FrontController extends AbstractController
 #[Route('/challenge/{id}', name: 'front_challenge')]
 public function voirChallenge(Challenge $challenge): Response
 {
-    return $this->render('front/challenge.html.twig', [
-        'challenge' => $challenge
+ $questions = $challenge->getQuestion();     return $this->render('front/challenge.html.twig', [
+        'challenge' => $challenge,
+        'questions' => $questions,
     ]);
 }
 
@@ -62,12 +65,10 @@ public function voirExamen(
     ReponseExamenRepository $reponseExamenRepository // <- ajouté
 ): Response
 {
-    $examen = $examenRepository->findOneBy(['niveauexamen' => $niveau]);
-
-    if (!$examen) {
-        throw $this->createNotFoundException("Aucun examen trouvé pour le niveau $niveau");
-    }
-
+$examen = $examenRepository->findOneBy(['niveauexamen' => $niveau]);
+if (!$examen) {
+    throw $this->createNotFoundException("Aucun examen trouvé pour le niveau $niveau");
+}
     $questions = $examen->getQuestions() ? explode('|', $examen->getQuestions()) : [];
     $commentaires = $commentaireRepository->findBy(['examen' => $examen]);
     $isAccessible = !$this->isGranted('ROLE_ENSEIGNANT');
@@ -155,6 +156,30 @@ public function comments(int $id, CommentaireRepository $repo): JsonResponse
 
     return $this->json($data);
 }
+#[Route('/challenge/{id}/train', name: 'challenge_train')]
+public function train(Challenge $challenge)
+{
+    return $this->render('challenge/train.html.twig', [
+        'challenge' => $challenge
+    ]);
+}
 
+#[Route('/send-test-email', name: 'send_test_email')]
+public function sendEmail(MailerInterface $mailer): Response
+{
+    $email = (new Email())
+        ->from('emnagarbaa200@gmail.com')   // ton email Gmail
+        ->to('emnagarbaa200@gmail.com') // à qui tu veux envoyer
+        ->subject('Test Symfony Mailer')
+        ->text('Ceci est un email de test.')
+        ->html('<p>Ceci est un email de test.</p>');
+
+    try {
+        $mailer->send($email);
+        return new Response('Email envoyé avec succès !');
+    } catch (\Exception $e) {
+        return new Response('Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+    }
+}
 
 }

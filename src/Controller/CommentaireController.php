@@ -15,6 +15,11 @@ use App\Repository\CommentaireRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Form\ExamenType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use App\Service\MailService;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 
 final class CommentaireController extends AbstractController
@@ -121,10 +126,11 @@ public function deleteCommentaire(
     ]);
 }
 #[Route('/commentaire/add', name: 'commentaire_add', methods: ['POST'])]
-public function add(Request $request, EntityManagerInterface $em): JsonResponse
-{
-    // 🔹 Plus de restriction de rôle
-    // $this->denyAccessUnlessGranted('ROLE_USER'); // supprimé
+public function add(
+    Request $request,
+    EntityManagerInterface $em,
+    ExamenRepository $examenRepository
+): JsonResponse {
 
     $user = $this->getUser();
     $content = $request->request->get('comment');
@@ -134,18 +140,17 @@ public function add(Request $request, EntityManagerInterface $em): JsonResponse
         return $this->json(['success' => false, 'message' => 'Données manquantes'], 400);
     }
 
-    $examen = $em->getRepository(Examen::class)->find($examenId);
+    $examen = $examenRepository->find($examenId);
     if (!$examen) {
         return $this->json(['success' => false, 'message' => 'Examen introuvable'], 404);
     }
 
+    // ---------------------------
+    // Création du commentaire
+    // ---------------------------
     $comment = new Commentaire();
     $comment->setExamen($examen);
-
-    // 🔹 Auteur simplifié
-    $auteur = $user ? ($user->getPrenom() . ' ' . $user->getNom()) : 'Anonyme';
-    $comment->setAuteur($auteur);
-
+    $comment->setAuteur($user ? ($user->getPrenom().' '.$user->getNom()) : 'Anonyme');
     $comment->setContenu($content);
     $comment->setDatecre(new \DateTime());
     $comment->setNbvue(0);
@@ -154,16 +159,60 @@ public function add(Request $request, EntityManagerInterface $em): JsonResponse
     $em->persist($comment);
     $em->flush();
 
+    // ---------------------------
+    // ENVOI MAIL AUX ETUDIANTS
+    // ---------------------------
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'emnagarbaa200@gmail.com';
+        $mail->Password = 'vqxuhqqembyqkvrr'; // mot de passe application
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        $mail->setFrom('emnagarbaa200@gmail.com', 'LearnFlex');
+
+        // ---------------------------
+        // Récupérer tous les étudiants ayant répondu à cet examen
+        // ---------------------------
+        $emails = [];
+        foreach ($examen->getReponseExamens() as $reponse) {
+            $etudiant = $reponse->getEtudiant();
+            if ($etudiant && !in_array($etudiant->getEmail(), $emails)) {
+                $emails[] = $etudiant->getEmail();
+                $mail->addAddress($etudiant->getEmail());
+            }
+        }
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Nouveau commentaire sur votre examen';
+        $mail->Body = "Un nouveau commentaire a été ajouté pour votre examen <b>{$examen->getTitre()}</b> :<br><b>$content</b>";
+
+        $mail->send();
+    } catch (\Exception $e) {
+        // On logue l'erreur sans bloquer la réponse JSON
+        error_log('Erreur mail : ' . $mail->ErrorInfo);
+    }
+
     return $this->json([
         'success' => true,
-        'id' => $comment->getId(),
-        'auteur' => $comment->getAuteur(),
-        'contenu' => $comment->getContenu(),
-        'date' => $comment->getDatecre()->format('d/m/Y'),
-        'likes' => $comment->getLikes(),
-        'nbvue' => $comment->getNbvue()
+        'comment' => [
+            'id' => $comment->getId(),
+            'auteur' => $comment->getAuteur(),
+            'contenu' => $comment->getContenu(),
+            'datecre' => $comment->getDatecre()->format('Y-m-d H:i:s'),
+            'nbvue' => $comment->getNbvue(),
+            'likes' => $comment->getLikes()
+        ]
     ]);
 }
+
+
+   
+    
 
   #[Route('/commentaire/like/{id}', name: 'commentaire_like', methods: ['POST'])]
     public function like(

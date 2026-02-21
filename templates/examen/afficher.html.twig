@@ -205,6 +205,11 @@
                                                class="action-btn view" title="Voir">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+                                            {# Bouton pour ouvrir les stats du graphique #}
+<a href="#" class="action-btn stats-btn" data-id="{{ examen.id }}" title="Statistiques">
+    <i class="fas fa-chart-pie"></i>
+</a>
+
                                             <a href="{{ path('app_editexamen', { id: examen.id }) }}"
                                                class="action-btn edit" title="Modifier">
                                                 <i class="fas fa-edit"></i>
@@ -263,6 +268,40 @@
         <input type="hidden" name="id_examen" id="delete-id">
     </form>
 </div>
+{% block googlecharts %}
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+{% endblock %}
 
-<script src="{{ asset('assets/js/main.js') }}"></script>
+{% block javascripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll('.stats-btn').forEach(btn => {
+    btn.addEventListener('click', async function(e) {
+        e.preventDefault();
+
+        const res = await fetch(`/examen/${this.dataset.id}/stats`);
+        const html = await res.text();
+
+        const modal = document.createElement("div");
+        modal.innerHTML = html;
+        document.body.appendChild(modal);
+
+        // force exécution scripts
+        modal.querySelectorAll("script").forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript);
+            oldScript.remove();
+        });
+
+        modal.querySelector(".close-modal").onclick = () => modal.remove();
+    });
+});
+
+
+});
+</script>
+{% endblock %}
+
 {% endblock %}

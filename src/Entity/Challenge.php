@@ -62,11 +62,26 @@ class Challenge
     #[ORM\JoinColumn(nullable: false)]
     private ?Examen $examen = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $question = null;
+   #[ORM\Column(type:"json", nullable:true)]
+private ?array $question = [];
+
+
 
     #[ORM\Column(length: 255)]
     private ?string $images = null;
+
+    #[ORM\Column]
+private int $dernierScore = 0;
+
+    #[ORM\Column(length: 255)]
+private string $dernierNiveau = "debutant";
+
+#[ORM\Column(type: "json", options: ["default" => "[]"])]
+    private array $reponses = [];
+
+#[ORM\Column(length: 255, nullable: true)]
+private ?string $interactyHash = null;
+
 
     public function getId(): ?int
     {
@@ -78,11 +93,14 @@ class Challenge
         return $this->titrec;
     }
  public function __construct()
-                      {
-                          $this->alerte = false;
-                          $this->progressionactuelle = 0;
-                          $this->datecreationn = new \DateTime();
-                      }
+                                                          {
+                                                              $this->alerte = false;
+                                                              $this->progressionactuelle = 0;
+                                                              $this->datecreationn = new \DateTime();
+                                                                      $this->reponses = [];
+         
+         
+                                                          }
     public function setTitrec(string $titrec): static
     {
         $this->titrec = $titrec;
@@ -258,17 +276,17 @@ class Challenge
         return $this;
     }
 
-    public function getQuestion(): ?string
-    {
-        return $this->question;
-    }
+    public function getQuestion(): array
+{
+    return $this->question ?? [];
+}
 
-    public function setQuestion(string $question): static
-    {
-        $this->question = $question;
+public function setQuestion(array $question): static
+{
+    $this->question = $question;
+    return $this;
+}
 
-        return $this;
-    }
 
     public function getImages(): ?string
     {
@@ -278,6 +296,64 @@ class Challenge
     public function setImages(string $images): static
     {
         $this->images = $images;
+
+        return $this;
+    }
+
+    public function getDernierScore(): ?int
+    {
+        return $this->dernierScore;
+    }
+
+    public function setDernierScore(int $dernierScore): static
+    {
+        $this->dernierScore = $dernierScore;
+
+        return $this;
+    }
+
+    public function getDernierNiveau(): ?string
+    {
+        return $this->dernierNiveau;
+    }
+
+    public function setDernierNiveau(string $dernierNiveau): static
+    {
+        $this->dernierNiveau = $dernierNiveau;
+
+        return $this;
+    }
+
+    public function getDernieresReponses(): array
+    {
+        return $this->dernieresReponses;
+    }
+
+    public function setDernieresReponses(array $dernieresReponses): static
+    {
+        $this->dernieresReponses = $dernieresReponses;
+
+        return $this;
+    }
+      public function getReponses(): array
+    {
+        return $this->reponses ?? [];
+    }
+
+    public function setReponses(array $reponses): static
+    {
+        $this->reponses = $reponses;
+        return $this;
+    }
+
+    public function getInteractyHash(): ?string
+    {
+        return $this->interactyHash;
+    }
+
+    public function setInteractyHash(?string $interactyHash): static
+    {
+        $this->interactyHash = $interactyHash;
 
         return $this;
     }

@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 
 class ChallengeType extends AbstractType
@@ -31,8 +32,15 @@ class ChallengeType extends AbstractType
                 'html5' => true,
                 'scale' => 2,
             ])
-             ->add('question', TextareaType::class)
-            ->add('niveaudifficulte', ChoiceType::class, [
+ ->add('question', TextareaType::class, [
+        'label' => 'Questions (JSON)',
+        'required' => false,
+        'mapped' => false, // si tu gères la conversion JSON toi-même
+        'data' => $options['data'] && $options['data']->getQuestion()
+            ? json_encode($options['data']->getQuestion(), JSON_PRETTY_PRINT)
+            : ''
+    ])
+        ->add('niveaudifficulte', ChoiceType::class, [
                 'choices' => [
                     'Facile' => 'facile',
                     'Moyen' => 'moyen',
@@ -73,6 +81,11 @@ class ChallengeType extends AbstractType
             ]),
         ],
     ])
+     ->add('interactyHash', TextType::class, [
+                'required' => false,
+                'label' => 'Iteracty Hash',
+                'attr' => ['placeholder' => 'Entrez l’ID ou Hash Interacty'],
+            ])
             ->add('datef', DateType::class, [
                 'widget' => 'single_text',
                 'input' => 'datetime',

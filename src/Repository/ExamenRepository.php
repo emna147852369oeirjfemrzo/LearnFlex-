@@ -63,5 +63,22 @@ public function getExamenParNiveau(string $niveau): ?Examen
         ->getQuery()
         ->getOneOrNullResult();
 }
+// src/Repository/ExamenRepository.php
+
+public function getEtudiantsInscrits($examen): array
+{
+    return $this->getEntityManager()
+        ->createQueryBuilder()
+        ->select('DISTINCT u')
+        ->from(Users::class, 'u')
+        ->join('u.reponseExamens', 'r')
+        ->join('r.examen', 'e')
+        ->where('e.id = :id')
+        ->setParameter('id', $examen->getId())
+        ->getQuery()
+        ->getResult();
+}
+
+
 
 }

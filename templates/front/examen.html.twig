@@ -1,4 +1,3 @@
-
 {% extends 'front/home.html.twig' %}
 
 {% block title %}{{ examen.titre }} | LearnFlex+{% endblock %}
@@ -8,7 +7,6 @@
     <div class="container">
         <div class="header-left">
             <div class="logo">
-                {# Logo clickable for Admin and Enseignant only #}
                 {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
                     <a href="{{ path('dashboard') }}">
                         <img src="{{ asset('assets/images/logo1.png') }}" alt="LearnFlexPlus Logo" class="main-logo">
@@ -30,14 +28,12 @@
                 <li><a href="#">Forum </a></li>
             </ul>
         </nav>
-        
-       <div class="header-right">
-            {# Dashboard button now optional, you can even remove it if logo is enough #}
+
+        <div class="header-right">
             {% if app.user and ('ROLE_ADMIN' in app.user.roles or 'ROLE_ENSEIGNANT' in app.user.roles) %}
                 <a href="{{ path('dashboard') }}" class="btn btn-outline dashboard-btn">Dashboard</a>
             {% endif %}
 
-            {# Logout for logged-in users #}
             {% if app.user %}
                 <form action="{{ path('app_logout') }}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-primary logout-btn">Déconnexion</button>
@@ -87,104 +83,101 @@
         </div>
     </section>
 
-
-
     <!-- ===== EXAM CONTENT ===== -->
     <section class="exam-content">
         <div class="container grid">
 
-            <!-- PDF + FORMULAIRE + COMMENTAIRES (à gauche) -->
+            <!-- GAUCHE : PDF + FORM + COMMENTAIRES -->
             <div id="examContainer" style="display:none;">
 
-                <!-- PDF -->
                 <h2>Support de l’examen</h2>
                 {% if examen.pdf %}
-                    <div class="pdf-viewer">
-                        <iframe src="{{ asset('assets/exams/' ~ examen.pdf) }}"></iframe>
+                    <div class="pdf-actions" style="margin-bottom:20px;">
+                        {{ pdf_bundle_render(examen.pdf) }}
                     </div>
-                    <div class="pdf-actions">
-                        <a href="{{ asset('assets/exams/' ~ examen.pdf) }}" target="_blank" class="btn btn-download">
-                            Télécharger le PDF
-                        </a>
+
+                    <div class="qr-code-container" style="text-align:center;">
+                        <h3>📲 Scanner le QR Code pour le PDF</h3>
+                        <canvas id="qrcodeExam" style="border:1px solid #ccc; padding:10px; border-radius:8px;"></canvas>
                     </div>
                 {% else %}
                     <div class="alert alert-warning">Aucun support PDF disponible pour cet examen.</div>
                 {% endif %}
 
-<div id="timerBox">
-    <span class="timer-icon">⏱️</span>
-    <span id="timer">00:00</span>
-</div>
-
+                <div id="timerBox">
+                    <span class="timer-icon">⏱️</span>
+                    <span id="timer">00:00</span>
+                </div>
 
                 <!-- FORMULAIRE QUESTIONS -->
-              <form id="examForm" style="margin-top:30px; display:none;">
-    <input type="hidden" name="_token" value="bc057383e6b9262.DtOkZKmoZhRJgCBhWq59M7DdqHtCoYuzVvxJmSv4yS8.S_7BCe3vK1Ez0RcOMvEqSeWJ7DYulLzyILkxzUOas0NZu9I-y_8CZXzwaQ">
-            <div class="question-card">
-            <div class="question-header">
-                <span>Question 1</span>
-            </div>
-            <div class="question-body">
-                <input type="text" name="q1" id="q1" placeholder="Écrivez votre réponse ici..." required>
-            </div>
-        </div>
-            <div class="question-card">
-            <div class="question-header">
-                <span>Question 2</span>
-            </div>
-            <div class="question-body">
-                <input type="text" name="q2" id="q2" placeholder="Écrivez votre réponse ici..." required>
-            </div>
-        </div>
-            <div class="question-card">
-            <div class="question-header">
-                <span>Question 3</span>
-            </div>
-            <div class="question-body">
-                <input type="text" name="q3" id="q3" placeholder="Écrivez votre réponse ici..." required>
-            </div>
-        </div>
-            <div class="question-card">
-            <div class="question-header">
-                <span>Question 4</span>
-            </div>
-            <div class="question-body">
-                <input type="text" name="q4" id="q4" placeholder="Écrivez votre réponse ici..." required>
-            </div>
-        </div>
-            <div class="question-card">
-            <div class="question-header">
-                <span>Question 5</span>
-            </div>
-            <div class="question-body">
-                <input type="text" name="q5" id="q5" placeholder="Écrivez votre réponse ici..." required>
-            </div>
-        </div>
-    <button type="button" id="submitExamBtn" class="btn btn-success" style="display:none;">Soumettre l’examen</button>
-<!-- Bloc pour commentaires enseignants -->
-<div id="teacherComments" style="display:none; margin-top:20px;">
-    <h3>Commentaires de l'enseignant</h3>
-    <div id="teacherCommentList"></div>
-</div>
+                <form id="examForm" style="margin-top:30px; display:none;">
+                    <input type="hidden" name="_token" value="bc057383e6b9262.DtOkZKmoZhRJgCBhWq59M7DdqHtCoYuzVvxJmSv4yS8.S_7BCe3vK1Ez0RcOMvEqSeWJ7DYulLzyILkxzUOas0NZu9I-y_8CZXzwaQ">
 
-</form>
+                    <div class="question-card">
+                        <div class="question-header">
+                            <span>Question 1</span>
+                        </div>
+                        <div class="question-body">
+                            <input type="text" name="q1" id="q1" placeholder="Écrivez votre réponse ici..." required>
+                        </div>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-header">
+                            <span>Question 2</span>
+                        </div>
+                        <div class="question-body">
+                            <input type="text" name="q2" id="q2" placeholder="Écrivez votre réponse ici..." required>
+                        </div>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-header">
+                            <span>Question 3</span>
+                        </div>
+                        <div class="question-body">
+                            <input type="text" name="q3" id="q3" placeholder="Écrivez votre réponse ici..." required>
+                        </div>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-header">
+                            <span>Question 4</span>
+                        </div>
+                        <div class="question-body">
+                            <input type="text" name="q4" id="q4" placeholder="Écrivez votre réponse ici..." required>
+                        </div>
+                    </div>
+                    <div class="question-card">
+                        <div class="question-header">
+                            <span>Question 5</span>
+                        </div>
+                        <div class="question-body">
+                            <input type="text" name="q5" id="q5" placeholder="Écrivez votre réponse ici..." required>
+                        </div>
+                    </div>
 
+                    <button type="button" id="submitExamBtn" class="btn btn-success" style="display:none;">Soumettre l’examen</button>
 
+                    <div id="teacherComments" style="display:none; margin-top:20px;">
+                        <h3>Commentaires de l'enseignant</h3>
+                        <div id="teacherCommentList"></div>
+                    </div>
+                </form>
 
             </div>
 
-            <!-- ACTIONS (à droite) -->
+            <!-- DROITE : ACTIONS + IA + COMMENTAIRES -->
             <aside class="exam-actions">
                 {% if is_granted('ROLE_ETUDIANT') %}
                     <button id="startExamBtn" class="btn btn-block">▶ Commencer l’examen</button>
                 {% elseif is_granted('ROLE_ENSEIGNANT') %}
                     <button id="accessResponsesBtn" class="btn btn-block">Voir les réponses des étudiants</button>
+
                     <div id="studentResponses" style="display:none; margin-top:20px;">
                         <h2>Réponses des étudiants</h2>
                         <div id="responsesList"></div>
 
-                        <!-- Bloc commentaire -->
                         <div id="commentSection" style="margin-top:30px;">
+                            <input type="hidden" id="examenId" value="{{ examen.id }}">
+
                             <h3>Ajouter un commentaire</h3>
                             <textarea id="commentContent" rows="4" class="form-control" placeholder="Écrire un commentaire..."></textarea>
                             <button id="submitCommentBtn" class="btn btn-primary" style="margin-top:10px;">Ajouter</button>
@@ -193,16 +186,15 @@
                                 <h4>Commentaires existants</h4>
                                 {% for commentaire in commentaires %}
                                     <div class="comment-item" data-id="{{ commentaire.id }}">
-                                        <strong>{{ commentaire.auteur }}</strong> 
+                                        <strong>{{ commentaire.auteur }}</strong>
                                         <span>({{ commentaire.datecre|date('d/m/Y') }})</span>
                                         <p>{{ commentaire.contenu }}</p>
-                                          <button class="edit-btn btn btn-outline btn-sm" data-url="{{ path('commentaire_edit', {'id': commentaire.id}) }}">
-        ✏️ Modifier
-    </button>
-
-    <button class="delete-btn btn btn-outline btn-sm" data-url="{{ path('commentaire_delete', {'id': commentaire.id}) }}">
-        🗑️ Supprimer
-    </button>
+                                        <button class="edit-btn btn btn-outline btn-sm" data-url="{{ path('commentaire_edit', {'id': commentaire.id}) }}">
+                                            ✏️ Modifier
+                                        </button>
+                                        <button class="delete-btn btn btn-outline btn-sm" data-url="{{ path('commentaire_delete', {'id': commentaire.id}) }}">
+                                            🗑️ Supprimer
+                                        </button>
                                     </div>
                                 {% else %}
                                     <p>Aucun commentaire pour le moment.</p>
@@ -210,6 +202,15 @@
                             </div>
                         </div>
                     </div>
+
+                    {# === BLOC ANALYSE IA DE LA RÉPONSE === #}
+                    <div id="aiAnalyzer" style="margin-top:25px;">
+                        <h3>Analyse IA d'une réponse</h3>
+                        <textarea id="aiStudentAnswer" class="form-control" rows="4" placeholder="Collez ici la réponse de l'étudiant à analyser..."></textarea>
+                        <button id="aiAnalyzeBtn" class="btn btn-secondary" style="margin-top:10px;">Analyser avec l’IA</button>
+                        <div id="aiAnalysisResult" class="alert alert-info d-none" style="margin-top:10px;"></div>
+                    </div>
+
                 {% else %}
                     <button class="btn btn-block" disabled>Accès réservé</button>
                 {% endif %}
@@ -223,11 +224,11 @@
                 </div>
             </aside>
 
-
         </div>
     </section>
 
 </main>
+
 
 <style>
 /* ===== PALETTE ===== */
@@ -911,16 +912,70 @@ a { text-decoration: none; transition: all 0.2s; }
 
 
 {% block javascripts %}
-    <script>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ===== VARIABLES GLOBALES =====
+    let interval = null; // Important pour timer et finishExam
     const startBtn = document.getElementById('startExamBtn');
     const examForm = document.getElementById('examForm');
     const commentList = document.getElementById('commentList');
     const submitExamBtn = document.getElementById('submitExamBtn');
- const teacherCommentsDiv = document.getElementById('teacherComments');
+    const teacherCommentsDiv = document.getElementById('teacherComments');
     const teacherCommentList = document.getElementById('teacherCommentList');
+    const commentsDiv = document.getElementById('commentSection');
+    const examContainer = document.getElementById('examContainer');
+    const examLock = document.getElementById('examLock');
+    const progressFill = document.getElementById('progressFill');
+    const timerEl = document.getElementById('timer');
 
-    // Affiche le formulaire et le bouton quand l'examen commence
+    // === ANALYSE IA DE LA RÉPONSE AVEC GROQ ===
+    const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
+    const aiAnswerInput = document.getElementById('aiStudentAnswer');
+    const aiResultDiv = document.getElementById('aiAnalysisResult');
+
+    if (aiAnalyzeBtn && aiAnswerInput && aiResultDiv) {
+        aiAnalyzeBtn.addEventListener('click', function () {
+            const answer = aiAnswerInput.value.trim();
+            if (!answer) { alert('Veuillez coller une réponse à analyser.'); return; }
+
+            aiAnalyzeBtn.disabled = true;
+            aiAnalyzeBtn.textContent = 'Analyse en cours...';
+
+            fetch('{{ path('analyze_answer') }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ answer: answer }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                aiResultDiv.classList.remove('d-none', 'alert-danger');
+                aiResultDiv.classList.add('alert-info');
+
+                if (!data.success) {
+                    aiResultDiv.classList.remove('alert-info');
+                    aiResultDiv.classList.add('alert-danger');
+                    aiResultDiv.textContent = data.message || "Erreur lors de l’analyse.";
+                } else {
+                    aiResultDiv.textContent = data.analysis;
+                }
+            })
+            .catch(() => {
+                aiResultDiv.classList.remove('d-none', 'alert-info');
+                aiResultDiv.classList.add('alert-danger');
+                aiResultDiv.textContent = "Erreur de communication avec le serveur.";
+            })
+            .finally(() => {
+                aiAnalyzeBtn.disabled = false;
+                aiAnalyzeBtn.textContent = 'Analyser avec l’IA';
+            });
+        });
+    }
+
+    // ===== AFFICHAGE DU FORMULAIRE AU CLIC START =====
     if(startBtn) {
         startBtn.addEventListener('click', function() {
             examForm.style.display = 'block';
@@ -929,329 +984,269 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Soumettre l'examen via AJAX
-    if(submitExamBtn && examForm) {
-        submitExamBtn.addEventListener('click', function() {
-            fetch("/examen/2/submit", {
-                method: "POST",
-                body: new FormData(examForm)
-            })
+    // ===== SOUMISSION EXAMEN AJAX =====
+    if(submitExamBtn && examForm){
+        submitExamBtn.addEventListener('click', function(){
+            fetch("/examen/2/submit", { method: "POST", body: new FormData(examForm) })
             .then(res => res.json())
             .then(data => {
-                if(data.success) {
+                if(data.success){
                     alert(data.message);
-                    // Désactiver le formulaire après soumission
                     examForm.querySelectorAll('input, button').forEach(el => el.disabled = true);
-
                     submitExamBtn.disabled = true;
-                     // ===== Afficher les commentaires de l'enseignant =====
-                    fetch(`/examen/2/comments`) // route qui renvoie les commentaires au format JSON
+
+                    // AFFICHER COMMENTAIRES ENSEIGNANT
+                    if(teacherCommentList && teacherCommentsDiv){
+                        fetch(`/examen/2/comments`)
                         .then(res => res.json())
                         .then(comments => {
-                            teacherCommentList.innerHTML = ''; // vider la liste avant ajout
-                            if(comments.length === 0) {
+                            teacherCommentList.innerHTML = '';
+                            if(comments.length === 0){
                                 teacherCommentList.innerHTML = '<p>Aucun commentaire pour le moment.</p>';
                             } else {
                                 comments.forEach(c => {
                                     const div = document.createElement('div');
                                     div.className = 'teacher-comment';
                                     div.style.marginBottom = '10px';
-                                    div.innerHTML = `
-                                        <strong>${c.auteur}</strong>
-                                        <span>(${c.date})</span>
-                                        <p>${c.contenu}</p>
-                                    `;
+                                    div.innerHTML = `<strong>${c.auteur}</strong> (<span>${c.date}</span>)<p>${c.contenu}</p>`;
                                     teacherCommentList.appendChild(div);
                                 });
                             }
-                            teacherCommentsDiv.style.display = 'block'; // afficher le bloc
+                            teacherCommentsDiv.style.display = 'block';
                         })
                         .catch(() => {
                             teacherCommentList.innerHTML = '<p>Impossible de charger les commentaires.</p>';
                             teacherCommentsDiv.style.display = 'block';
                         });
-                } else {
-                    alert(data.message || "Erreur lors de l'envoi de l'examen");
-                }
+                    }
+                } else alert(data.message || "Erreur lors de l'envoi de l'examen");
             })
             .catch(() => alert("Erreur serveur"));
         });
     }
-    if (!window.commentHandlerAttached) {
-    window.commentHandlerAttached = true;
-    const submitBtn = document.getElementById('submitCommentBtn');
-    const commentContent = document.getElementById('commentContent');
-    const commentList = document.getElementById('commentList');
-const commentsDiv = document.getElementById('commentSection');
 
-if (submitBtn && commentContent && commentList) {
-submitBtn.addEventListener('click', function() {
-        const content = commentContent.value.trim();
-        if (!content) {
-            alert("Le commentaire ne peut pas être vide.");
-            return;
+    // ===== AJOUT COMMENTAIRE =====
+    if(!window.commentHandlerAttached){
+        window.commentHandlerAttached = true;
+        const submitBtn = document.getElementById('submitCommentBtn');
+        const commentContent = document.getElementById('commentContent');
+
+        if(submitBtn && commentContent && commentList){
+            submitBtn.addEventListener('click', function(){
+                const content = commentContent.value.trim();
+                if(!content){ alert("Le commentaire ne peut pas être vide."); return; }
+
+                const examenIdEl = document.getElementById('examenId');
+                if(!examenIdEl) return;
+                const examenId = examenIdEl.value;
+
+                fetch('/commentaire/add', {
+                    method:'POST',
+                    headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest' },
+                    body: new URLSearchParams({ 'comment': content, 'examenId': examenId })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success){
+                        const div = document.createElement('div');
+                        div.className = 'comment-item';
+                        div.dataset.id = data.id;
+                        div.innerHTML = `
+                            <strong>${data.auteur}</strong> (<span>${data.date}</span>)
+                            <p>${data.contenu}</p>
+                            <button class="edit-btn btn btn-outline btn-sm" data-url="/commentaire/${data.id}/edit">✏️ Modifier</button>
+                            <button class="delete-btn btn btn-outline btn-sm" data-url="/commentaire/${data.id}/delete">🗑️ Supprimer</button>
+                        `;
+                        commentList.prepend(div);
+                        commentContent.value = '';
+                    } else alert(data.message || "Erreur lors de l'ajout du commentaire");
+                })
+                .catch(err => console.error(err));
+            });
         }
 
-        fetch('/commentaire/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({
-                'comment': content,
-                'examenId': '2'
-            })
-        })
-        .then(response => response.json())
-       .then(data => {
-    if (data.success) {
-        // Ajouter le commentaire dans la liste
-        const div = document.createElement('div');
-        div.className = 'comment-item';
-        div.dataset.id = data.id;
-    div.innerHTML = `
-    <strong>${data.auteur}</strong>
-    <span>(${data.date})</span>
-    <p>${data.contenu}</p>
-    <button class="edit-btn btn btn-outline btn-sm"
-            data-url="/commentaire/${data.id}/edit">
-        ✏️ Modifier
-    </button>
-    <button class="delete-btn btn btn-outline btn-sm"
-            data-url="/commentaire/${data.id}/delete">
-        🗑️ Supprimer
-    </button>
-`;
+        // ===== SUPPRESSION & MODIFICATION COMMENTAIRES =====
+        if(commentList){
+            commentList.addEventListener('click', function(e){
+                const btn = e.target;
+                const commentDiv = btn.closest('.comment-item');
+                if(!commentDiv) return;
 
+                // SUPPRESSION
+                if(btn.classList.contains('delete-btn')){
+                    if(!confirm("Voulez-vous vraiment supprimer ce commentaire ?")) return;
+                    fetch(btn.dataset.url, { method:'POST', headers:{ 'X-Requested-With':'XMLHttpRequest' } })
+                    .then(res => res.json())
+                    .then(data => { if(data.success){ commentDiv.remove(); alert("Commentaire supprimé !"); } else alert(data.message || "Erreur suppression"); })
+                    .catch(() => alert("Erreur réseau"));
+                }
 
-        commentList.prepend(div);
-        commentContent.value = '';
-    } else {
-        alert(data.message || "Erreur lors de l'ajout du commentaire");
-    }
-})
+                // MODIFICATION
+                if(btn.classList.contains('edit-btn')){
+                    const p = commentDiv.querySelector('p');
+                    const oldContent = p.textContent;
+                    const newContent = prompt("Modifier le commentaire :", oldContent);
+                    if(!newContent || newContent.trim() === oldContent) return;
 
-        .catch(err => console.error(err));
-    });
-}
-    // ===== SUPPRESSION & MODIFICATION COMMENTAIRES (Event Delegation) =====
-    commentList.addEventListener('click', function(e) {
-        const btn = e.target;
-        const commentDiv = btn.closest('.comment-item');
-        if (!commentDiv) return;
+                    fetch(btn.dataset.url, {
+                        method:'POST',
+                        headers:{ 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest' },
+                        body: new URLSearchParams({ contenu: newContent })
+                    })
+                    .then(res => res.json())
+                    .then(data => { if(data.success){ p.textContent = newContent; alert("Commentaire modifié !"); } else alert(data.message || "Erreur modification"); })
+                    .catch(() => alert("Erreur réseau"));
+                }
+            });
+        }
+         // ===== AFFICHAGE REPONSES ETUDIANTS =====
+    const btn = document.getElementById('accessResponsesBtn');
+    const container = document.getElementById('studentResponses');
+    const list = document.getElementById('responsesList');
 
-   // --- SUPPRESSION ---
-        if (btn.classList.contains('delete-btn')) {
-            if (!confirm("Voulez-vous vraiment supprimer ce commentaire ?")) return;
-
-            fetch(btn.dataset.url, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
+    if(btn){
+        btn.addEventListener('click', function(){
+            fetch('/examen/2/reponses')
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    commentDiv.remove();
-                    alert("Commentaire supprimé avec succès !");
-                } else {
-                    alert(data.message || "Erreur lors de la suppression");
-                }
+                list.innerHTML = '';
+                if(data.length === 0){ list.innerHTML = '<p>Aucune réponse soumise.</p>'; container.style.display='block'; return; }
+
+                data.forEach(etudiant => {
+                    const card = document.createElement('div');
+                    card.classList.add('student-card');
+                    card.style.cssText = 'border:1px solid #ccc; padding:15px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;';
+                    card.innerHTML = `<h3>Étudiant : ${etudiant.etudiant}</h3><small>Date dernier essai : ${etudiant.date}</small>`;
+
+                    const questionsDiv = document.createElement('div');
+                    questionsDiv.style.marginTop = '10px';
+                    for(const [question, reponse] of Object.entries(etudiant.reponses)){
+                        const qDiv = document.createElement('div');
+                        qDiv.classList.add('response-card');
+                        qDiv.style.marginBottom = '5px';
+                        qDiv.innerHTML = `<strong>${question} :</strong> ${reponse}`;
+                        questionsDiv.appendChild(qDiv);
+                    }
+                    card.appendChild(questionsDiv);
+                    list.appendChild(card);
+                });
+
+                container.style.display = 'block';
             })
-            .catch(() => alert("Erreur réseau, impossible de supprimer le commentaire"));
-        }
-
-        // --- MODIFICATION ---
-        if (btn.classList.contains('edit-btn')) {
-            const p = commentDiv.querySelector('p');
-            const oldContent = p.textContent;
-            const newContent = prompt("Modifier le commentaire :", oldContent);
-            if (!newContent || newContent.trim() === oldContent) return;
-
-            fetch(btn.dataset.url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: new URLSearchParams({ contenu: newContent })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    p.textContent = newContent;
-                    alert("Commentaire modifié avec succès !");
-                } else {
-                    alert(data.message || "Erreur lors de la modification");
-                }
-            })
-            .catch(() => alert("Erreur réseau, impossible de modifier le commentaire"));
-        }
-    });
-    }
-    
- const btn = document.getElementById('accessResponsesBtn');
-const container = document.getElementById('studentResponses');
-const list = document.getElementById('responsesList');
-
-if(btn) {
-    btn.addEventListener('click', function() {
-       fetch('/examen/2/reponses')
-    .then(res => res.json())
-    .then(data => {
-        list.innerHTML = '';
-        if(data.length === 0){
-            list.innerHTML = '<p>Aucune réponse soumise pour cet examen.</p>';
-            container.style.display = 'block';
-            return;
-        }
-
-        data.forEach(etudiant => {
-            const card = document.createElement('div');
-            card.classList.add('student-card');
-            card.style.border = '1px solid #ccc';
-            card.style.padding = '15px';
-            card.style.marginBottom = '15px';
-            card.style.borderRadius = '8px';
-            card.style.backgroundColor = '#f9f9f9';
-
-            card.innerHTML = `<h3 style="margin:0 0 5px 0;">Étudiant : ${etudiant.etudiant}</h3>
-                              <small style="color: #555;">Date du dernier essai : ${etudiant.date}</small>`;
-
-            const questionsDiv = document.createElement('div');
-            questionsDiv.style.marginTop = '10px';
-
-            for(const [question, reponse] of Object.entries(etudiant.reponses)){
-                const qDiv = document.createElement('div');
-                qDiv.classList.add('response-card');
-                qDiv.style.marginBottom = '5px';
-                qDiv.innerHTML = `<strong>${question} :</strong> ${reponse}`;
-                questionsDiv.appendChild(qDiv);
-            }
-
-            card.appendChild(questionsDiv);
-            list.appendChild(card);
+            .catch(err => { console.error(err); list.innerHTML='<p>Impossible de charger les réponses.</p>'; container.style.display='block'; });
         });
-
-        container.style.display = 'block';
-    })
-    .catch(err => {
-        console.error('Erreur lors du fetch des réponses :', err);
-        list.innerHTML = '<p>Impossible de charger les réponses pour le moment.</p>';
-        container.style.display = 'block';
-    });
-
-    });
-}
-
-    // ===== ELEMENTS =====
-    const examContainer = document.getElementById('examContainer');
-    const examLock = document.getElementById('examLock');
-    const progressFill = document.getElementById('progressFill');
-    const timerEl = document.getElementById('timer');
-    const addCommentForm = document.getElementById('addCommentForm');
-
-    if (!startBtn || !examContainer || !examForm) return;
-
-    // ===== VERIFICATION DATE =====
-    const endDate = new Date("2026-02-15 00:00:00");
-    const now = new Date();
-    let isAccessible = now <= endDate;
-
-    if (!isAccessible) {
-        startBtn.disabled = true;
-        examLock.textContent = "❌ L’examen a expiré.";
-        examContainer.style.display = 'block';
-        examForm.style.display = 'block';
-        disableForm(examForm);
-        commentsDiv.style.display = 'block';
-    } else {
-        examLock.textContent = "▶ Cliquez sur « Commencer l’examen »";
     }
 
-    // ===== TIMER =====
-    let totalTime = 1 * 60; // secondes
-    let elapsed = 0;
-    let interval = null;
+    // ===== VERIFICATION DATE ET TIMER =====
+    if(startBtn && examContainer && examForm){
+        const endDate = new Date("2027-02-15 00:00:00");
+        const now = new Date();
+        let isAccessible = now <= endDate;
 
-    startBtn.addEventListener('click', function () {
-        examContainer.style.display = 'block';
-        examForm.style.display = 'block';
-        examLock.style.display = 'none';
-        startBtn.disabled = true;
+        if(!isAccessible){
+            startBtn.disabled = true;
+            examLock.textContent = "❌ L’examen a expiré.";
+            examContainer.style.display = 'block';
+            examForm.style.display = 'block';
+            disableForm(examForm);
+            commentsDiv.style.display='block';
+        } else {
+            examLock.textContent = "▶ Cliquez sur « Commencer l’examen »";
+        }
 
-        interval = setInterval(function () {
-            elapsed++;
-            let minutes = Math.floor(elapsed / 60);
-            let seconds = elapsed % 60;
-            timerEl.textContent = String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0');
+        let totalTime = 1*60; // secondes
+        let elapsed = 0;
 
-            let progressPercent = Math.min(Math.floor((elapsed / totalTime) * 100), 100);
-            progressFill.style.width = progressPercent + '%';
-            progressFill.textContent = progressPercent + '%';
+        startBtn.addEventListener('click', function(){
+            examContainer.style.display='block';
+            examForm.style.display='block';
+            examLock.style.display='none';
+            startBtn.disabled=true;
 
-            if (elapsed >= totalTime || new Date() >= endDate) {
-                finishExam("⏰ Temps écoulé !");
-            }
-        }, 1000);
-    }, { once: true }); // évite double déclenchement si bouton cliqué plusieurs fois
+            interval = setInterval(function(){
+                elapsed++;
+                let minutes = Math.floor(elapsed/60);
+                let seconds = elapsed % 60;
+                timerEl.textContent = String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0');
 
-   
+                let progressPercent = Math.min(Math.floor((elapsed/totalTime)*100),100);
+                progressFill.style.width = progressPercent+'%';
+                progressFill.textContent = progressPercent+'%';
 
-    function finishExam(message) {
+                if(elapsed >= totalTime || new Date() >= endDate){
+                    finishExam("⏰ Temps écoulé !");
+                }
+            },1000);
+        }, { once:true });
+    }
+
+    function finishExam(message){
         clearInterval(interval);
         disableForm(examForm);
-        progressFill.style.width = '100%';
-        progressFill.textContent = '100%';
-        commentsDiv.style.display = 'block';
+        progressFill.style.width='100%';
+        progressFill.textContent='100%';
+        commentsDiv.style.display='block';
         examLock.textContent = message;
-        examLock.style.display = 'block';
+        examLock.style.display='block';
         alert(message);
     }
 
-    function disableForm(form) {
-        form.querySelectorAll('input, textarea, button, select').forEach(el => el.disabled = true);
+    function disableForm(form){
+        form.querySelectorAll('input, textarea, button, select').forEach(el => el.disabled=true);
     }
 
-   
     // ===== LIKE COMMENTAIRES =====
-    if (!window.likeHandlerAttached) { // évite double attachement
+    if(!window.likeHandlerAttached){
         window.likeHandlerAttached = true;
-        document.addEventListener('click', function(e) {
-            if (!e.target.classList.contains('like-btn')) return;
+        document.addEventListener('click', function(e){
+            if(!e.target.classList.contains('like-btn')) return;
 
             const btn = e.target;
             const meta = btn.closest('.comment-meta');
             const likesSpan = meta.querySelector('.likes');
             const commentId = btn.dataset.id;
 
-            if (!commentId) {
-                let likes = parseInt(btn.dataset.likes || 0) + 1;
+            if(!commentId){
+                let likes = parseInt(btn.dataset.likes || 0)+1;
                 btn.dataset.likes = likes;
-                likesSpan.textContent = "Likes : " + likes;
-                btn.disabled = true;
+                likesSpan.textContent = "Likes : "+likes;
+                btn.disabled=true;
                 btn.textContent = "👍 Liké";
                 return;
             }
 
-            fetch(`/commentaire/like/${commentId}`, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            fetch(`/commentaire/like/${commentId}`, { method:'POST', headers:{ 'X-Requested-With':'XMLHttpRequest' } })
+            .then(res=>res.json())
+            .then(data=>{
+                likesSpan.textContent = "Likes : "+data.likes;
+                btn.disabled=true;
+                btn.textContent="👍 Liké";
             })
-            .then(res => res.json())
-            .then(data => {
-                likesSpan.textContent = "Likes : " + data.likes;
-                btn.disabled = true;
-                btn.textContent = "👍 Liké";
-            })
-            .catch(() => alert("Erreur lors du like"));
+            .catch(()=>alert("Erreur lors du like"));
         });
     }
-    
-});
 
+
+    }
+
+    // ===== QR CODE EXAMEN =====
+    const qrCanvas = document.getElementById('qrcodeExam');
+    if(qrCanvas){
+        const pdfUrl = "http://192.168.1.115:8000/examen/pdf/{{ examen.id }}";
+        QRCode.toCanvas(qrCanvas, pdfUrl, { width:200 }, function(error){
+            if(error) console.error(error);
+        });
+    }
+
+});
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+    const pdfUrl = "http://192.168.1.115:8000/examen/pdf/{{ examen.id }}";
+    QRCode.toCanvas(document.getElementById('qrcodeExam'), pdfUrl, { width:200 }, function(error){
+        if(error) console.error(error);
+    });
+</script>
 {% endblock %}
-
 {% endblock %}

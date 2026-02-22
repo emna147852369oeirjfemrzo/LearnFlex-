@@ -51,4 +51,31 @@ class GptOssService
 
         return 'Aucune analyse retournée par le modèle.';
     }
+    public function generateFeedback(string $prompt): string
+{
+    $response = $this->client->request('POST', 'https://api.groq.com/openai/v1/chat/completions', [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Content-Type'  => 'application/json',
+        ],
+        'json' => [
+            'model'    => 'llama3-8b-8192',  // ✅ modèle qui existe sur Groq
+            'messages' => [
+                [
+                    'role'    => 'user',
+                    'content' => $prompt,
+                ],
+            ],
+            'max_tokens' => 300,
+        ],
+    ]);
+
+    $data = $response->toArray(false);
+
+    if (isset($data['choices'][0]['message']['content'])) {
+        return trim($data['choices'][0]['message']['content']);
+    }
+
+    return 'Feedback indisponible.';
+}
 }

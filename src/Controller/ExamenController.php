@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Knp\Snappy\Pdf;
+use App\Entity\CheatLog;
 
 final class ExamenController extends AbstractController
 {
@@ -170,26 +172,6 @@ final class ExamenController extends AbstractController
             'niveau_selectionne' => $niveau,
         ]);
     }
-
-    #[Route('/examen/pdf/{id}', name: 'app_examen_pdf')]
-    public function pdfExamen(Examen $examen): Response
-    {
-        $html = $this->renderView('examen/pdf.html.twig', [
-            'examen' => $examen,
-        ]);
-
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-        $filename = 'Examen_' . $examen->getTitre() . '.pdf';
-
-        return new Response($dompdf->stream($filename, [
-            'Attachment' => true,
-        ]));
-    }
-
     #[Route('/trieexamen', name: 'app_trieexamen_list')]
     public function trieexamen(Request $request, ExamenRepository $repo): Response
     {
@@ -259,7 +241,6 @@ final class ExamenController extends AbstractController
         $comment->setAuteur($author);
         $comment->setContenu($text);
         $comment->setExamen($examen);
-        $comment->setDatecre(new \DateTime());
         $comment->setNbvue(0);
         $comment->setLikes(0);
 
@@ -271,7 +252,6 @@ final class ExamenController extends AbstractController
             'id'      => $comment->getId(),
             'author'  => $comment->getAuteur(),
             'contenu' => $comment->getContenu(),
-            'date'    => $comment->getDatecre()->format('d/m/Y'),
             'nbvue'   => $comment->getNbvue(),
             'likes'   => $comment->getLikes(),
         ]);
@@ -313,19 +293,30 @@ final class ExamenController extends AbstractController
 
         return $this->json($data);
     }
-
-    #[Route('/examen/pdf/{id}', name: 'examen_pdf')]
-    public function pdf(Examen $examen): Response
-    {
+// ✅ après — URL unique sans conflit
+#[Route('/examen/{id}/voir-pdf', name: 'examen_pdf')]
+public function pdf(Examen $examen): Response
+{
+    if ($examen->getPdf()) {
         $pdfPath = $this->getParameter('kernel.project_dir') . '/public/assets/exams/' . $examen->getPdf();
-
-        if (!file_exists($pdfPath)) {
-            throw $this->createNotFoundException("Le PDF de l'examen n'existe pas.");
+        if (file_exists($pdfPath)) {
+            return new BinaryFileResponse($pdfPath, 200, [
+                'Content-Disposition' => 'attachment; filename="' . $examen->getPdf() . '"',
+            ]);
         }
-
-        return new BinaryFileResponse($pdfPath);
     }
 
+    $html = $this->renderView('examen/pdf.html.twig', ['examen' => $examen]);
+    $dompdf = new Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    return new Response($dompdf->output(), 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="Examen_' . $examen->getTitre() . '.pdf"',
+    ]);
+}
     #[Route('/examen/{id}/pdf', name: 'generate_examen_pdf')]
     public function generatePdf(Examen $examen, PdfService $pdfService): Response
     {
@@ -334,41 +325,47 @@ final class ExamenController extends AbstractController
         return $pdfService->generateExamenPdf($examen, $etudiant);
     }
 
-    #[Route('/examen/{id}/stats', name: 'app_examen_stats')]
-    public function stats(Examen $examen, ExamenRepository $repo): Response
-    {
-        $examens = $repo->findAll();
+   #[Route('/examen/{id}/stats', name: 'app_examen_stats')]
+public function stats(Examen $examen, ExamenRepository $repo): Response
+{
+    $examens = $repo->findAll();
 
-        $stats = [
-            'Facile'    => 0,
-            'Moyen'     => 0,
-            'Difficile' => 0,
-        ];
+    // Stats par état
+    $parEtat = [];
+    // Stats par matière
+    $parMatiere = [];
+    // Stats durée par matière
+    $dureeParMatiere = [];
+    $countParMatiere = [];
 
-        foreach ($examens as $e) {
-            $niveau = ucfirst($e->getNiveauexamen());
-            if (isset($stats[$niveau])) {
-                $stats[$niveau]++;
-            }
-        }
+    foreach ($examens as $e) {
+        // Par état
+        $etat = $e->getEtat() ?? 'Inconnu';
+        $parEtat[$etat] = ($parEtat[$etat] ?? 0) + 1;
 
-        $data = [['Niveau', 'Nombre']];
+        // Par matière
+        $mat = $e->getMatiere() ?? 'Inconnu';
+        $parMatiere[$mat] = ($parMatiere[$mat] ?? 0) + 1;
 
-        foreach ($stats as $niveau => $count) {
-            $data[] = [$niveau, $count];
-        }
-
-        $pieChart = new PieChart();
-        $pieChart->getData()->setArrayToDataTable($data);
-        $pieChart->getOptions()->setTitle('Répartition des examens par niveau');
-        $pieChart->getOptions()->setHeight(400);
-        $pieChart->getOptions()->setWidth(600);
-
-        return $this->render('examen/stats_modal.html.twig', [
-            'pieChart' => $pieChart,
-        ]);
+        // Durée par matière
+        $dureeParMatiere[$mat] = ($dureeParMatiere[$mat] ?? 0) + $e->getDuree();
+        $countParMatiere[$mat] = ($countParMatiere[$mat] ?? 0) + 1;
     }
 
+    // Durée moyenne
+    $dureeMoyenne = [];
+    foreach ($dureeParMatiere as $mat => $total) {
+        $dureeMoyenne[$mat] = round($total / $countParMatiere[$mat]);
+    }
+
+    return $this->render('examen/stats_modal.html.twig', [
+        'parEtat'       => $parEtat,
+        'parMatiere'    => $parMatiere,
+        'dureeMoyenne'  => $dureeMoyenne,
+        'examen'        => $examen,
+        'totalExamens'  => count($examens),
+    ]);
+}
     #[Route('/examen/analyze-answer', name: 'analyze_answer', methods: ['POST'])]
     public function analyzeAnswer(Request $request, GptOssService $gptOssService): JsonResponse
     {
@@ -388,4 +385,91 @@ final class ExamenController extends AbstractController
             'analysis' => $analysis,
         ]);
     }
+    #[Route('/examen/{id}/cheat', name: 'examen_cheat_report', methods: ['POST'])]
+public function reportCheat(Examen $examen, Request $request, EntityManagerInterface $em): JsonResponse
+{
+    $type  = $request->request->get('type');
+    $count = (int) $request->request->get('count');
+    $user  = $this->getUser();
+
+    // Logguer en base (créez une entité CheatLog ou loggez dans un fichier)
+    $log = new CheatLog();
+    $log->setExamen($examen);
+    $log->setEtudiant($user);
+    $log->setType($type);
+    $log->setCount($count);
+    $log->setCreatedAt(new \DateTime());
+
+    $em->persist($log);
+    $em->flush();
+
+    return new JsonResponse(['success' => true]);
+}
+#[Route('/examen/{id}/rapport-pdf', name: 'examen_rapport_pdf')]
+public function rapportPdf(
+    Examen $examen,
+    EntityManagerInterface $em,
+    Pdf $pdf
+): Response {
+    // Récupérer les réponses des étudiants
+    $reponses = $examen->getReponseExamens();
+
+    // Récupérer les commentaires
+    $commentaires = $examen->getCommentaires();
+
+    // Récupérer les logs anti-triche
+    $cheatLogs = $em->getRepository(CheatLog::class)->findBy(
+        ['examen' => $examen],
+        ['createdAt' => 'DESC']
+    );
+
+    // Stats réponses par étudiant
+    $statsEtudiants = [];
+    foreach ($reponses as $r) {
+        $nom = $r->getEtudiant()?->getNom() ?? 'Anonyme';
+        if (!isset($statsEtudiants[$nom])) {
+            $statsEtudiants[$nom] = [
+                'nom'      => $nom,
+                'nbRep'    => 0,
+                'derniere' => null,
+            ];
+        }
+        $statsEtudiants[$nom]['nbRep']++;
+        $statsEtudiants[$nom]['derniere'] = $r->getDateSoumission();
+    }
+
+    // Stats infractions
+    $infractionsParType = [];
+    foreach ($cheatLogs as $log) {
+        $type = $log->getType();
+        $infractionsParType[$type] = ($infractionsParType[$type] ?? 0) + 1;
+    }
+$logoPath = $this->getParameter('kernel.project_dir') . '/public/assets/images/logo1.png';
+$logoBase64 = file_exists($logoPath) ? base64_encode(file_get_contents($logoPath)) : '';
+    $html = $this->renderView('examen/rapport_pdf.html.twig', [
+        'examen'             => $examen,
+        'statsEtudiants'     => array_values($statsEtudiants),
+        'commentaires'       => $commentaires,
+        'infractionsParType' => $infractionsParType,
+        'cheatLogs'          => $cheatLogs,
+        'dateGeneration'     => new \DateTime(),
+        'logoBase64'         => $logoBase64,
+    ]);
+
+    $content = $pdf->getOutputFromHtml($html, [
+        'page-size'           => 'A4',
+        'orientation'         => 'Portrait',
+        'margin-top'          => '15',
+        'margin-bottom'       => '15',
+        'margin-left'         => '15',
+        'margin-right'        => '15',
+        'encoding'            => 'UTF-8',
+        'enable-local-file-access' => true,
+    ]);
+
+    return new Response($content, 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="Rapport_' . $examen->getTitre() . '.pdf"',
+    ]);
+}
 }

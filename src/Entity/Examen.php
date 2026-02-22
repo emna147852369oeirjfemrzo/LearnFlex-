@@ -7,10 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: ExamenRepository::class)]
 class Examen
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -52,9 +56,6 @@ class Examen
     #[ORM\Column(length: 50)]
     private ?string $etat = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $datecreation = null;
-
     /**
      * @var Collection<int, Commentaire>
      */
@@ -70,8 +71,8 @@ class Examen
     #[ORM\Column(length: 255)]
     private ?string $pdf = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $questions = null;
+   #[ORM\Column(type: 'text', nullable: true)]
+private ?string $questions = null;
 
     /**
      * @var Collection<int, ReponseExamen>
@@ -236,19 +237,6 @@ class Examen
 
         return $this;
     }
-
-    public function getDatecreation(): ?\DateTime
-    {
-        return $this->datecreation;
-    }
-
-    public function setDatecreation(\DateTime $datecreation): static
-    {
-        $this->datecreation = $datecreation;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Commentaire>
      */

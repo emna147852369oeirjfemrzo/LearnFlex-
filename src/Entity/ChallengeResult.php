@@ -30,6 +30,19 @@ class ChallengeResult
     #[ORM\Column]
     private ?\DateTime $createdAt = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+private array $reponses = [];
+
+public function getReponses(): array 
+{ 
+    return $this->reponses ?? []; 
+}
+
+public function setReponses(array $reponses): static 
+{ 
+    $this->reponses = $reponses; 
+    return $this; 
+}
     public function getId(): ?int
     {
         return $this->id;

@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\ChallengeResult;
 use App\Service\GroqService;
-
+use Knp\Snappy\Pdf;
+use App\Service\GptOssService;
 
 class ChallengeController extends AbstractController
 {
@@ -35,7 +36,6 @@ public function addChallenge(Request $request, ManagerRegistry $doctrine): Respo
     $challenge = new Challenge();
 
     // Initialise les champs automatiques
-    $challenge->setDatecreationn(new \DateTime());
     $challenge->setProgressionactuelle(0);
     $challenge->setAlerte(false);
 
@@ -206,22 +206,68 @@ public function triechallenge(
 }
 
 #[Route('/admin/challenge/pdf/{id}', name: 'app_challenge_pdf')]
-public function pdfchallenge(Challenge $challenge): Response
-{
-    $html = $this->renderView('challenge/pdf.html.twig', [
-        'challenge' => $challenge
+public function pdfchallenge(
+    Challenge $challenge,
+    EntityManagerInterface $em,
+    Pdf $pdf
+): Response {
+    // Résultats des étudiants
+    $results = $em->getRepository(ChallengeResult::class)->findBy(
+        ['challenge' => $challenge],
+        ['createdAt' => 'DESC']
+    );
+
+    // Stats par étudiant
+    $statsEtudiants = [];
+    foreach ($results as $r) {
+        $nom = $r->getUser()?->getNom() ?? 'Anonyme';
+        if (!isset($statsEtudiants[$nom])) {
+            $statsEtudiants[$nom] = [
+                'nom'      => $nom,
+                'score'    => $r->getScore(),
+                'badge'    => $r->getBadges(),
+                'derniere' => $r->getCreatedAt(),
+            ];
+        }
+    }
+
+    // Logo base64
+    $logoPath   = $this->getParameter('kernel.project_dir') . '/public/assets/images/logo1.png';
+    $logoBase64 = file_exists($logoPath) ? base64_encode(file_get_contents($logoPath)) : '';
+
+    // Image challenge base64
+    $imageBase64 = '';
+    if ($challenge->getImages()) {
+        $imagePath = $this->getParameter('kernel.project_dir') . '/public/uploads/photos/' . $challenge->getImages();
+        if (file_exists($imagePath)) {
+            $ext         = pathinfo($imagePath, PATHINFO_EXTENSION);
+            $mime        = $ext === 'png' ? 'image/png' : 'image/jpeg';
+            $imageBase64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($imagePath));
+        }
+    }
+
+    $html = $this->renderView('challenge/rapport_pdf.html.twig', [
+        'challenge'      => $challenge,
+        'statsEtudiants' => array_values($statsEtudiants),
+        'logoBase64'     => $logoBase64,
+        'imageBase64'    => $imageBase64,
+        'dateGeneration' => new \DateTime(),
     ]);
 
-    $dompdf = new \Dompdf\Dompdf();
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->render();
+    $content = $pdf->getOutputFromHtml($html, [
+        'page-size'                => 'A4',
+        'orientation'              => 'Portrait',
+        'margin-top'               => '0',
+        'margin-bottom'            => '15',
+        'margin-left'              => '15',
+        'margin-right'             => '15',
+        'encoding'                 => 'UTF-8',
+        'enable-local-file-access' => true,
+    ]);
 
-    $pdfContent = $dompdf->output();
-
-    return new Response($pdfContent, 200, [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'attachment; filename="Challenge_'.$challenge->getTitrec().'.pdf"'
+    return new Response($content, 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="Challenge_' . $challenge->getTitrec() . '.pdf"',
     ]);
 }
  #[Route('/challenge/{id}/update-score', name: 'challenge_update_score', methods: ['POST'])]
@@ -230,16 +276,12 @@ public function updateScore(Request $request, Challenge $challenge, EntityManage
     $data = json_decode($request->getContent(), true);
 
     if (!$data || !isset($data['score'], $data['niveau'], $data['reponses'])) {
-        return $this->json([
-            'status' => 'error',
-            'message' => 'Données invalides'
-        ], 400);
+        return $this->json(['status' => 'error', 'message' => 'Données invalides'], 400);
     }
 
-    $user = $this->getUser(); // l'étudiant connecté
-
+    $user = $this->getUser();
     if (!$user) {
-        return $this->json(['status'=>'error','message'=>'Utilisateur non connecté'], 401);
+        return $this->json(['status' => 'error', 'message' => 'Non connecté'], 401);
     }
 
     $challengeResult = new ChallengeResult();
@@ -247,8 +289,8 @@ public function updateScore(Request $request, Challenge $challenge, EntityManage
     $challengeResult->setUser($user);
     $challengeResult->setScore($data['score']);
     $challengeResult->setCreatedAt(new \DateTime());
+    $challengeResult->setReponses($data['reponses']); // ← AJOUTE CETTE LIGNE
 
-    // Badge selon score
     $badge = $data['score'] >= 80 ? "🏆 Expert" :
              ($data['score'] >= 60 ? "🥇 Compétent" :
              ($data['score'] >= 40 ? "🥈 Apprenti" : "🥉 Novice"));
@@ -257,9 +299,8 @@ public function updateScore(Request $request, Challenge $challenge, EntityManage
     $em->persist($challengeResult);
     $em->flush();
 
-    return $this->json(['status'=>'success']);
+    return $this->json(['status' => 'success']);
 }
-
   #[Route('/leaderboard', name: 'leaderboard', methods: ['GET'])]
 public function leaderboard(EntityManagerInterface $em): Response
 {
@@ -329,5 +370,69 @@ public function leaderboard(EntityManagerInterface $em): Response
             return $this->redirectToRoute('challenge_generate_form', ['id' => $challenge->getId()]);
         }
 
+}
+#[Route('/challenge/{id}/feedback', name: 'challenge_feedback', methods: ['POST'])]
+public function feedback(
+    Challenge $challenge,
+    Request $request,
+    GroqService $groqService,  // ← remplace GptOssService par GroqService
+    EntityManagerInterface $em
+): JsonResponse {
+    try {
+        $score = $request->request->get('score');
+
+        $prompt = sprintf(
+            "Un étudiant vient de terminer le challenge '%s'. 
+            Il a obtenu un score de %s%% sur un objectif de %s%%.
+            Génère un feedback personnalisé en français en 3 points : 
+            1. Félicitations ou encouragements
+            2. Points forts observés
+            3. Conseil concret pour progresser. 
+            Maximum 100 mots.",
+            $challenge->getTitrec(),
+            $score,
+            $challenge->getObjectifscore()
+        );
+
+        $feedback = $groqService->generateFeedback($prompt);
+
+        return $this->json([
+            'success'  => true,
+            'feedback' => $feedback,
+            'score'    => (int)$score,
+            'objectif' => $challenge->getObjectifscore(),
+            'reussi'   => (int)$score >= $challenge->getObjectifscore(),
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'error'   => $e->getMessage(),
+        ], 500);
+    }
+}
+#[Route('/challenge/{id}/history', name: 'challenge_history', methods: ['GET'])]
+public function history(Challenge $challenge, EntityManagerInterface $em): JsonResponse
+{
+    $user = $this->getUser();
+    if (!$user) return $this->json([], 401);
+
+    $results = $em->getRepository(ChallengeResult::class)->findBy(
+        ['challenge' => $challenge, 'user' => $user],
+        ['createdAt' => 'ASC']
+    );
+
+    $data = [];
+    foreach ($results as $i => $r) {
+        $data[] = [
+            'attemptNumber' => $i + 1,
+            'score'         => $r->getScore(),
+            'badge'         => $r->getBadges(),
+            'reponses'      => $r->getReponses(),
+            'createdAt'     => $r->getCreatedAt()->format('d/m/Y H:i'),
+        ];
+    }
+
+    return $this->json($data);
 }
 }

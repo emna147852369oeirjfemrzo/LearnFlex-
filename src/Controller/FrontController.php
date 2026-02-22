@@ -39,7 +39,6 @@ final class FrontController extends AbstractController
         // Récupérer les challenges actifs depuis la base
         $challenges = $challengeRepo->findBy(
             ['etat' => 'actif'],
-            ['datecreationn' => 'DESC']
         );
 
         return $this->render('front/evaluation.html.twig', [

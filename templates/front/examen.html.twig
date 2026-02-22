@@ -96,10 +96,16 @@
                         {{ pdf_bundle_render(examen.pdf) }}
                     </div>
 
-                    <div class="qr-code-container" style="text-align:center;">
-                        <h3>📲 Scanner le QR Code pour le PDF</h3>
-                        <canvas id="qrcodeExam" style="border:1px solid #ccc; padding:10px; border-radius:8px;"></canvas>
-                    </div>
+                 {% if examen.pdf %}
+    <div style="text-align:center; margin-top:20px;">
+        <a href="{{ path('examen_pdf', {id: examen.id}) }}"
+           style="display:inline-flex; align-items:center; gap:10px; padding:14px 24px; background:#1f4f65; color:#fff; border-radius:14px; font-weight:600; text-decoration:none; font-size:1rem; box-shadow:0 4px 15px rgba(31,79,101,0.3); transition:all 0.3s ease;"
+           onmouseover="this.style.background='#4DB6AC'; this.style.transform='translateY(-2px)';"
+           onmouseout="this.style.background='#1f4f65'; this.style.transform='translateY(0)';">
+            <i class="fas fa-download"></i> Télécharger le PDF
+        </a>
+    </div>
+{% endif %}
                 {% else %}
                     <div class="alert alert-warning">Aucun support PDF disponible pour cet examen.</div>
                 {% endif %}
@@ -187,7 +193,6 @@
                                 {% for commentaire in commentaires %}
                                     <div class="comment-item" data-id="{{ commentaire.id }}">
                                         <strong>{{ commentaire.auteur }}</strong>
-                                        <span>({{ commentaire.datecre|date('d/m/Y') }})</span>
                                         <p>{{ commentaire.contenu }}</p>
                                         <button class="edit-btn btn btn-outline btn-sm" data-url="{{ path('commentaire_edit', {'id': commentaire.id}) }}">
                                             ✏️ Modifier
@@ -204,13 +209,37 @@
                     </div>
 
                     {# === BLOC ANALYSE IA DE LA RÉPONSE === #}
-                    <div id="aiAnalyzer" style="margin-top:25px;">
-                        <h3>Analyse IA d'une réponse</h3>
-                        <textarea id="aiStudentAnswer" class="form-control" rows="4" placeholder="Collez ici la réponse de l'étudiant à analyser..."></textarea>
-                        <button id="aiAnalyzeBtn" class="btn btn-secondary" style="margin-top:10px;">Analyser avec l’IA</button>
-                        <div id="aiAnalysisResult" class="alert alert-info d-none" style="margin-top:10px;"></div>
-                    </div>
+                   {# Remplacez votre div#aiAnalyzer par ceci #}
+<div id="aiAnalyzer" style="margin-top:25px; background:#fff; border-radius:20px; padding:25px; box-shadow:0 6px 20px rgba(0,0,0,0.08);">
+    
+    <h3 style="color:var(--primary); font-size:18px; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+        <i class="fas fa-robot" style="color:#6f42c1;"></i> Analyse IA d'une réponse
+    </h3>
 
+    <textarea 
+        id="aiStudentAnswer" 
+        rows="4" 
+        placeholder="Collez ici la réponse de l'étudiant à analyser..."
+        style="width:100%; padding:14px 16px; border-radius:14px; border:1px solid #d1d5db; font-size:14px; resize:vertical; transition:all 0.3s ease; box-sizing:border-box; font-family:'Poppins',sans-serif;"
+        onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 10px rgba(31,79,101,0.25)';"
+        onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';">
+    </textarea>
+
+    <button 
+        id="aiAnalyzeBtn" 
+        style="margin-top:12px; padding:10px 20px; background:var(--primary); color:#fff; border:none; border-radius:12px; cursor:pointer; font-weight:500; font-family:'Poppins',sans-serif; display:flex; align-items:center; gap:8px; transition:all 0.3s ease;"
+        onmouseover="this.style.background='var(--accent)'; this.style.transform='translateY(-2px)';"
+        onmouseout="this.style.background='var(--primary)'; this.style.transform='translateY(0)';">
+        <i class="fas fa-robot"></i> Analyser avec l'IA
+    </button>
+
+    <div 
+        id="aiAnalysisResult" 
+        class="d-none"
+        style="margin-top:14px; padding:14px 18px; border-radius:14px; background:#f0f7ff; border-left:4px solid var(--primary); color:#1f4f65; font-size:14px; line-height:1.6; display:none;">
+    </div>
+
+</div>
                 {% else %}
                     <button class="btn btn-block" disabled>Accès réservé</button>
                 {% endif %}
@@ -928,7 +957,80 @@ document.addEventListener('DOMContentLoaded', function () {
     const examLock = document.getElementById('examLock');
     const progressFill = document.getElementById('progressFill');
     const timerEl = document.getElementById('timer');
+// ===== ANTI-TRICHE =====
+let cheatCount = 0;
+const cheatWarningEl = document.createElement('div');
+cheatWarningEl.style.cssText = `
+    display:none; position:fixed; top:20px; right:20px; z-index:9999;
+    background:#ef4444; color:#fff; padding:14px 20px; border-radius:14px;
+    font-weight:600; font-size:14px; box-shadow:0 4px 20px rgba(239,68,68,0.4);
+    animation: slideIn 0.3s ease;
+`;
+document.body.appendChild(cheatWarningEl);
 
+function showCheatWarning(message) {
+    cheatWarningEl.textContent = `⚠️ ${message} (infraction n°${cheatCount})`;
+    cheatWarningEl.style.display = 'block';
+    setTimeout(() => cheatWarningEl.style.display = 'none', 3000);
+}
+
+function reportCheat(type) {
+    cheatCount++;
+    const examenId = {{ examen.id }};
+    fetch(`/examen/${examenId}/cheat`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({ type: type, count: cheatCount })
+    });
+
+    if (cheatCount >= 3) {
+        finishExam("🚫 Examen terminé pour comportement suspect.");
+    }
+}
+
+// Détecter quitter la fenêtre
+document.addEventListener('visibilitychange', function () {
+    if (document.hidden && examForm && examForm.style.display !== 'none') {
+        showCheatWarning("Vous avez quitté l'onglet !");
+        reportCheat('tab_switch');
+    }
+});
+
+// Détecter copier-coller
+document.addEventListener('copy', function (e) {
+    if (examForm && examForm.style.display !== 'none') {
+        e.preventDefault();
+        showCheatWarning("Copier est interdit pendant l'examen !");
+        reportCheat('copy');
+    }
+});
+
+document.addEventListener('paste', function (e) {
+    if (examForm && examForm.style.display !== 'none') {
+        e.preventDefault();
+        showCheatWarning("Coller est interdit pendant l'examen !");
+        reportCheat('paste');
+    }
+});
+
+document.addEventListener('cut', function (e) {
+    if (examForm && examForm.style.display !== 'none') {
+        e.preventDefault();
+        showCheatWarning("Couper est interdit pendant l'examen !");
+        reportCheat('cut');
+    }
+});
+
+// Détecter clic droit
+document.addEventListener('contextmenu', function (e) {
+    if (examForm && examForm.style.display !== 'none') {
+        e.preventDefault();
+        showCheatWarning("Clic droit interdit pendant l'examen !");
+    }
+});
     // === ANALYSE IA DE LA RÉPONSE AVEC GROQ ===
     const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
     const aiAnswerInput = document.getElementById('aiStudentAnswer');
@@ -952,8 +1054,10 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(data => {
-                aiResultDiv.classList.remove('d-none', 'alert-danger');
-                aiResultDiv.classList.add('alert-info');
+              aiResultDiv.style.display = 'block';
+aiResultDiv.style.borderLeftColor = 'var(--primary)';
+aiResultDiv.style.background = '#f0f7ff';
+aiResultDiv.style.color = '#1f4f65';
 
                 if (!data.success) {
                     aiResultDiv.classList.remove('alert-info');
@@ -1154,7 +1258,8 @@ document.addEventListener('DOMContentLoaded', function () {
             examLock.textContent = "▶ Cliquez sur « Commencer l’examen »";
         }
 
-        let totalTime = 1*60; // secondes
+       // ✅ après — durée depuis la base de données (en minutes → secondes)
+let totalTime = {{ examen.duree }} * 60;
         let elapsed = 0;
 
         startBtn.addEventListener('click', function(){
@@ -1228,25 +1333,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     }
-
-    // ===== QR CODE EXAMEN =====
-    const qrCanvas = document.getElementById('qrcodeExam');
-    if(qrCanvas){
-        const pdfUrl = "http://192.168.1.115:8000/examen/pdf/{{ examen.id }}";
-        QRCode.toCanvas(qrCanvas, pdfUrl, { width:200 }, function(error){
-            if(error) console.error(error);
-        });
-    }
-
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"
+        integrity="sha256-2osqDEbR/CBjLQZQGWpqYHRGMJsBFUDPGn1Xy05TYIU="
+        crossorigin="anonymous"></script>
 <script>
-    const pdfUrl = "http://192.168.1.115:8000/examen/pdf/{{ examen.id }}";
-    QRCode.toCanvas(document.getElementById('qrcodeExam'), pdfUrl, { width:200 }, function(error){
-        if(error) console.error(error);
+(function() {
+    var el = document.getElementById('qrcodeExam');
+    if (!el) return;
+
+    // ✅ IP fixe de votre réseau WiFi
+    var url = 'http://192.168.1.115:8000/examen/{{ examen.id }}/voir-pdf';
+
+    new QRCode(el, {
+        text: url,
+        width: 200,
+        height: 200,
+        colorDark: '#1f4f65',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
     });
+})();
 </script>
 {% endblock %}
 {% endblock %}

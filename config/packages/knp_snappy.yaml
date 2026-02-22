@@ -1,7 +1,7 @@
 knp_snappy:
     pdf:
         enabled: true
-        binary: '%env(WKHTMLTOPDF_PATH)%'
+        binary: 'C:\PROGRA~1\WKHTML~1\bin\WKHTML~2.EXE'
         options:
             page-size: A4
             encoding: UTF-8
@@ -11,5 +11,5 @@ knp_snappy:
             margin-right: 10mm
     image:
         enabled: true
-        binary: '%env(WKHTMLTOIMAGE_PATH)%'
-        options: []
+        binary: 'C:\PROGRA~1\WKHTML~1\bin\WKHTML~2.EXE'
+        options: {}

@@ -5,11 +5,15 @@ namespace App\Entity;
 use App\Repository\ChallengeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Knp\Snappy\Pdf;
 
 #[ORM\Entity(repositoryClass: ChallengeRepository::class)]
 class Challenge
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -52,9 +56,6 @@ class Challenge
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $datelimite = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $datecreationn = null;
-
     #[ORM\Column]
     private ?bool $alerte = null;
 
@@ -96,7 +97,6 @@ private ?string $interactyHash = null;
                                                           {
                                                               $this->alerte = false;
                                                               $this->progressionactuelle = 0;
-                                                              $this->datecreationn = new \DateTime();
                                                                       $this->reponses = [];
          
          
@@ -236,18 +236,6 @@ private ?string $interactyHash = null;
     public function setDatelimite(\DateTime $datelimite): static
     {
         $this->datelimite = $datelimite;
-
-        return $this;
-    }
-
-    public function getDatecreationn(): ?\DateTime
-    {
-        return $this->datecreationn;
-    }
-
-    public function setDatecreationn(\DateTime $datecreationn): static
-    {
-        $this->datecreationn = $datecreationn;
 
         return $this;
     }

@@ -58,7 +58,39 @@ private const MODEL = 'openai/gpt-oss-20b';
             throw new \RuntimeException('Erreur Groq : ' . $e->getMessage());
         }
     }
+public function generateFeedback(string $prompt): string
+{
+    try {
+        $response = $this->httpClient->request('POST', self::API_URL, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->groqApiKey,
+                'Content-Type'  => 'application/json',
+            ],
+            'json' => [
+                'model'    => self::MODEL,
+                'messages' => [
+                    [
+                        'role'    => 'system',
+                        'content' => 'Tu es un coach pédagogique bienveillant. Tu réponds toujours en français.'
+                    ],
+                    [
+                        'role'    => 'user',
+                        'content' => $prompt
+                    ]
+                ],
+                'temperature' => 0.7,
+                'max_tokens'  => 300,
+            ],
+        ]);
 
+        $data = $response->toArray();
+        return $data['choices'][0]['message']['content'] ?? 'Feedback indisponible.';
+
+    } catch (\Exception $e) {
+        $this->logger->error('[GroqService] generateFeedback : ' . $e->getMessage());
+        throw new \RuntimeException('Erreur feedback : ' . $e->getMessage());
+    }
+}
     private function buildPrompt(string $sujet, string $type, int $count, string $level): string
     {
         return match ($type) {

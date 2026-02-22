@@ -1,4 +1,3 @@
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Liste des organismes{% endblock %}
@@ -7,56 +6,36 @@
 <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
 {% endblock %}
 
 {% block body %}
- <aside class="sidebar">
-      <div class="sidebar-header">
+<aside class="sidebar">
+    <div class="sidebar-header">
         <div class="logo">
-          <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="nav-logo">
-          <span>LearnFlex</span><span class="highlight">+</span>
+            <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="nav-logo">
+            <span>LearnFlex</span><span class="highlight">+</span>
         </div>
-        <button class="sidebar-toggle">
-          <i class="fas fa-bars"></i>
-        </button>
-      </div>
-      
-      <div class="sidebar-content">
+        <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-content">
         <nav class="sidebar-menu">
-          <ul>
-            <li class="active">
-              <a href="#">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-users"></i>
-                <span>Utilisateurs</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-book-open"></i>
-                <span>contenu pédagogique</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Evaluation</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-question-circle"></i>
-                <span>Questionnaire</span>
-              </a>
-            </li>
-            <li>
+            <ul>
+                 <li class="active">
+                          <a href="{{ path('dashboard') }}">
+                              <i class="fas fa-tachometer-alt"></i>
+                              <span>Dashboard</span>
+                          </a>
+                      </li>
+                <li class="active">
+                        <a href="{{ path('app_users') }}">
+                            <i class="fas fa-users"></i>
+                            <span>Utilisateurs</span>
+                        </a>
+                    </li>
+                <li><a href="#"><i class="fas fa-book-open"></i><span>contenu pédagogique</span></a></li>
+                <li><a href="#"><i class="fas fa-graduation-cap"></i><span>Evaluation</span></a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i><span>Questionnaire</span></a></li>
+                <li>
               <a href="#">
                 <i class="fas fa-directions"></i>
                 <span>Orientation</span>
@@ -76,156 +55,472 @@
                     <span>Événement</span>
                   </a>
                 </li>
-              
-            <li>
-              <a href="#">
-                <i class="fas fa-comments"></i>
-                <span>Forum</span>
-              </a>
-            </li>
-          </ul>
+                
+                <li><a href="#"><i class="fas fa-comments"></i><span>Forum</span></a></li>
+            </ul>
         </nav>
-      </div>
-      
-      <div class="sidebar-footer">
+    </div>
+    <div class="sidebar-footer">
         <a href="#" class="user-profile">
-          <img src="{{ asset('assets/images/placeholder-admin.png') }}" alt="Admin" class="user-img">
-          <div class="user-info">
-            <h4>Admin User</h4>
-            <p>Administrateur</p>
-          </div>
+            <img src="{{ asset('assets/images/placeholder-admin.png') }}" alt="Admin" class="user-img">
+            <div class="user-info"><h4>Admin User</h4><p>Administrateur</p></div>
         </a>
-        <a href="#" class="logout">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Déconnexion</span>
-        </a>
-      </div>
-    </aside>
+        <a href="#" class="logout"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></a>
+    </div>
+</aside>
 
 <div class="main-content">
     <div class="container mt-4 table-container">
         <h3>Liste des organismes</h3>
 
-        
-        <div class="controls-row" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
-            <div>
-                <a href="{{ path('app_organisme_new') }}" class="btn btn-sm btn-success">
-                    <i class="fas fa-plus"></i> Ajouter un organisme
-                </a>
-            </div>
+        <div class="controls-row" style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:nowrap; overflow-x:auto;">
 
-            <!-- Search form -->
-            <form method="get" action="{{ path('organisme_search') }}" class="organisme-search" style="display:flex; align-items:center; gap:8px;">
-                <label for="query" style="display:flex; align-items:center; gap:8px; font-weight:500; color:#333;">
-                    <i class="fas fa-search"></i>
-                    <span class="sr-only">Rechercher</span>
-                </label>
-                <input id="query" name="query" type="text" value="{{ app.request.get('query') }}" placeholder="Rechercher par nom..." style="padding:8px 10px; border:1px solid #ccc; border-radius:4px; min-width:220px;">
-                <button type="submit" class="btn btn-sm btn-primary" style="padding:8px 12px;"><i class="fas fa-arrow-right"></i></button>
+            <a href="{{ path('app_organisme_new') }}" class="btn btn-sm btn-success">
+                <i class="fas fa-plus"></i> Ajouter un organisme
+            </a>
+
+            {# ══ 3 boutons statistiques Google Charts ══ #}
+            <button id="btn-type-stats" class="btn btn-sm"
+                style="background:#7c3aed; color:#fff; border:none; border-radius:4px; padding:6.5px 12px; font-weight:500;">
+                <i class="fas fa-chart-pie"></i> Stats par Type
+            </button>
+
+            <button id="btn-ville-stats" class="btn btn-sm"
+                style="background:#0f766e; color:#fff; border:none; border-radius:4px; padding:6.5px 12px; font-weight:500;">
+                <i class="fas fa-chart-pie"></i> Stats par Ville
+            </button>
+
+            <button id="btn-frais-stats" class="btn btn-sm"
+                style="background:#b45309; color:#fff; border:none; border-radius:4px; padding:6.5px 12px; font-weight:500;">
+                <i class="fas fa-chart-bar"></i> Stats Frais Min
+            </button>
+
+            {# ══ Recherche ══ #}
+            <form method="get" action="{{ path('organisme_search') }}" style="display:flex; align-items:center; gap:8px;">
+                <input name="query" type="text" value="{{ app.request.get('query') }}"
+                    placeholder="Rechercher par nom..."
+                    style="padding:8px 10px; border:1px solid #ccc; border-radius:4px; min-width:200px;">
+                <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-arrow-right"></i></button>
             </form>
 
-            <!-- Sort by taille buttons (independent from search) -->
-            <div class="sort-controls" style="display:flex; gap:8px; align-items:center;">
-                <span style="font-weight:500; color:#333;">Trier par fraisMin</span>
-                <a href="{{ path('organisme_frais', {'direction':'ASC'}) }}" class="btn btn-sm" title="Trier par taille ascendant" style="background:#eef; border:1px solid #bbd;">
-                    <i class="fas fa-sort-amount-down"></i>
-                </a>
-                <a href="{{ path('organisme_frais', {'direction':'DESC'}) }}" class="btn btn-sm" title="Trier par taille descendant" style="background:#fee; border:1px solid #dba;">
-                    <i class="fas fa-sort-amount-up"></i>
-                </a>
-            </div>
+            {# ══ Tri fraisMin ══ #}
+            <div style="display:flex; gap:8px; align-items:center; white-space:nowrap;">
+    <span style="font-weight:500; color:#333;">Trier par fraisMin</span>
+    <a href="{{ path('organisme_frais', {'direction':'ASC'}) }}" class="btn btn-sm"
+        style="background:#eef; border:1px solid #bbd;" title="Croissant">
+        <i class="fas fa-sort-amount-down"></i>
+    </a>
+    <a href="{{ path('organisme_frais', {'direction':'DESC'}) }}" class="btn btn-sm"
+        style="background:#fee; border:1px solid #dba;" title="Décroissant">
+        <i class="fas fa-sort-amount-up"></i>
+    </a>
+</div>
         </div>
 
         <div class="table-wrapper">
             <table class="organisme-table mt-3">
                 <thead>
                     <tr>
-                        <th>photo</th>
-                        <th>ID</th>
-                        <th>Nom</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                        <th>Site Web</th>
-                        <th>Email</th>
-                        <th>Téléphone</th>
-                        <th>Ville</th>
-                        <th>Actif</th>
-                        <th>Frais Min</th>
-                        <th>Langue</th>
-                        <th>Opportunités Stage</th>
-                        <th>Opportunités Emploi</th>
-                        <th>Actions</th>
+                        <th>Photo</th><th>ID</th><th>Nom</th><th>Type</th><th>Description</th>
+                        <th>Site Web</th><th>Email</th><th>Téléphone</th><th>Ville</th><th>Actif</th>
+                        <th>Frais Min</th><th>Langue</th><th>Opport. Stage</th><th>Opport. Emploi</th><th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-{% for organisme in organismes %}
-    <tr>
-        <td>
-            {% if organisme.photo %}
-                <img src="{{ asset('uploads/organismes/' ~ organisme.photo) }}" alt="Logo" style="max-width: 100px;">
-            {% else %}
-                <span>Aucune image</span>
-            {% endif %}
-        </td>
-
-        <td>{{ organisme.id }}</td>
-        <td>{{ organisme.nom }}</td>
-        <td>{{ organisme.type }}</td>
-        <td>{{ organisme.description }}</td>
-
-        <td>
-            {% if organisme.siteWeb %}
-                <a href="{{ organisme.siteWeb }}" target="_blank">{{ organisme.siteWeb }}</a>
-            {% else %}
-                N/A
-            {% endif %}
-        </td>
-
-        <td>{{ organisme.email }}</td>
-        <td>{{ organisme.telephone }}</td>
-        <td>{{ organisme.ville }}</td>
-
-        <td>{{ organisme.actif ? 'Oui' : 'Non' }}</td>
-
-        <td>{{ organisme.fraisMin }}</td>
-        <td>{{ organisme.langue }}</td>
-
-        <td>{{ organisme.opportunitesStage ? 'Oui' : 'Non' }}</td>
-        <td>{{ organisme.opportunitesEmploi ? 'Oui' : 'Non' }}</td>
-
-        <td class="action-btns">
-            <a href="{{ path('app_organisme_edit', { 'id': organisme.id }) }}" class="btn btn-sm btn-warning" title="Modifier" style="margin-right:5px;">
-                <i class="fas fa-edit"></i>
-            </a>
-            <a href="{{ path('app_organisme_delete', { 'id': organisme.id }) }}" class="btn btn-sm btn-danger"
-               onclick="return confirm('Voulez-vous vraiment supprimer cet organisme ?');" title="Supprimer">
-                <i class="fas fa-trash"></i>
-            </a>
-        </td>
-    </tr>
-{% else %}
-    <tr>
-        <td colspan="15" class="text-center text-muted">Aucun organisme trouvé</td>
-    </tr>
-{% endfor %}
-</tbody>
-
+                {% for organisme in organismes %}
+                <tr>
+                    <td>
+                        {% if organisme.photo %}
+                            <img src="{{ asset('uploads/organismes/' ~ organisme.photo) }}" alt="Logo" style="max-width:60px; border-radius:6px;">
+                        {% else %}<span style="color:#aaa;">—</span>{% endif %}
+                    </td>
+                    <td>{{ organisme.id }}</td>
+                    <td>{{ organisme.nom }}</td>
+                    <td>{{ organisme.type }}</td>
+                    <td>{{ organisme.description|slice(0,50) ~ '...' }}</td>
+                    <td>
+                        {% if organisme.siteWeb %}
+                            <a href="{{ organisme.siteWeb }}" target="_blank">{{ organisme.siteWeb|slice(0,25) ~ '...' }}</a>
+                        {% else %}N/A{% endif %}
+                    </td>
+                    <td>{{ organisme.email }}</td>
+                    <td>{{ organisme.telephone }}</td>
+                    <td>{{ organisme.ville }}</td>
+                    <td>{{ organisme.actif ? 'Oui' : 'Non' }}</td>
+                    <td>{{ organisme.fraisMin }}</td>
+                    <td>{{ organisme.langue }}</td>
+                    <td>{{ organisme.opportunitesStage ? 'Oui' : 'Non' }}</td>
+                    <td>{{ organisme.opportunitesEmploi ? 'Oui' : 'Non' }}</td>
+                    <td class="action-btns">
+                        <a href="{{ path('app_organisme_edit', {'id': organisme.id}) }}" class="btn btn-sm btn-warning" title="Modifier" style="margin-right:5px;">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{{ path('app_organisme_delete', {'id': organisme.id}) }}" class="btn btn-sm btn-danger" title="Supprimer"
+                            onclick="return confirm('Voulez-vous vraiment supprimer cet organisme ?');">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="15" class="text-center text-muted">Aucun organisme trouvé</td></tr>
+                {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
-</div>
 
+
+    {# ══════════════════════════════════════════════
+       MODAL 1 — Stats par TYPE  (Google PieChart)
+    ══════════════════════════════════════════════ #}
+    <div id="typeStatsModal" class="stats-modal-backdrop" style="display:none;">
+        <div class="stats-modal">
+            <div class="stats-header" style="background:#7c3aed;">
+                <h3><i class="fas fa-chart-pie"></i> Statistiques par Type</h3>
+                <button class="close-modal-btn" data-modal="typeStatsModal">&times;</button>
+            </div>
+            <div class="stats-body">
+                <div class="stats-chart-wrap">
+                    <p class="stats-chart-title" style="color:#7c3aed;">Répartition des organismes par type</p>
+                    <div id="gc-type-chart" style="width:100%; height:300px;"></div>
+                </div>
+                <div class="stats-highlight-card" style="border-color:#ddd6fe;">
+                    <p class="stats-label" style="color:#7c3aed;">Type le plus représenté</p>
+                    <h4 id="top-type-name">—</h4>
+                    <p id="top-type-value" class="stats-value" style="color:#5b21b6;">—</p>
+                    <p id="type-total-organismes" class="stats-meta"></p>
+                    <p id="type-nb-types" class="stats-meta"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ══════════════════════════════════════════════
+       MODAL 2 — Stats par VILLE  (Google PieChart)
+    ══════════════════════════════════════════════ #}
+    <div id="villeStatsModal" class="stats-modal-backdrop" style="display:none;">
+        <div class="stats-modal">
+            <div class="stats-header" style="background:#0f766e;">
+                <h3><i class="fas fa-chart-pie"></i> Statistiques par Ville</h3>
+                <button class="close-modal-btn" data-modal="villeStatsModal">&times;</button>
+            </div>
+            <div class="stats-body">
+                <div class="stats-chart-wrap">
+                    <p class="stats-chart-title" style="color:#0f766e;">Répartition des organismes par ville</p>
+                    <div id="gc-ville-chart" style="width:100%; height:300px;"></div>
+                </div>
+                <div class="stats-highlight-card" style="border-color:#d1fae5;">
+                    <p class="stats-label" style="color:#0f766e;">Ville avec le plus d'organismes</p>
+                    <h4 id="top-ville-name">—</h4>
+                    <p id="top-ville-value" class="stats-value" style="color:#065f46;">—</p>
+                    <p id="ville-total-organismes" class="stats-meta"></p>
+                    <p id="ville-nb-villes" class="stats-meta"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ══════════════════════════════════════════════
+       MODAL 3 — Stats FRAIS MIN  (Google BarChart)
+    ══════════════════════════════════════════════ #}
+    <div id="fraisStatsModal" class="stats-modal-backdrop" style="display:none;">
+        <div class="stats-modal">
+            <div class="stats-header" style="background:#b45309;">
+                <h3><i class="fas fa-chart-bar"></i> Statistiques Frais Min</h3>
+                <button class="close-modal-btn" data-modal="fraisStatsModal">&times;</button>
+            </div>
+            <div class="stats-body">
+                <div class="stats-chart-wrap">
+                    <p class="stats-chart-title" style="color:#b45309;">Frais minimum par organisme (€)</p>
+                    <div id="gc-frais-chart" style="width:100%; height:300px;"></div>
+                </div>
+                <div class="stats-highlight-card" style="border-color:#fde68a;">
+                    <p class="stats-label" style="color:#b45309;">Organisme le plus cher</p>
+                    <h4 id="top-frais-name">—</h4>
+                    <p id="top-frais-value" class="stats-value" style="color:#92400e;">—</p>
+                    <p id="frais-total-organismes" class="stats-meta"></p>
+                    <p id="frais-moyenne" class="stats-meta"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>{# /main-content #}
+
+
+{# ════════════════════════════════════════════ CSS ════ #}
 <style>
-body { display:flex; margin:0; font-family:Arial, sans-serif; }
-.main-content { margin-left:250px; flex:1; padding:20px; background:#fff; }
-.table-wrapper { overflow-x:auto; max-height:80vh; }
-.organisme-table { width:100%; border-collapse:collapse; font-size:14px; background:#fff; }
-.organisme-table th, .organisme-table td { padding:12px; text-align:left; border-bottom:1px solid #ddd; white-space:nowrap; }
-.organisme-table th { background:#007bff; color:white; font-weight:bold; }
+body { display:flex; margin:0; font-family:'Poppins',sans-serif; background:#f4f7fe; min-height:100vh; }
+.main-content { margin-left:260px; flex:1; padding:30px; background:#f4f7fe; min-width:0; transition:all .3s; }
+.main-content.expanded { margin-left:70px; }
+.container { max-width:1400px; margin:0 auto; width:100%; }
+
+.sidebar { width:260px; flex-shrink:0; background:#1f4f65; height:100vh; position:fixed; top:0; left:0; transition:all .3s; z-index:1000; color:#fff; display:flex; flex-direction:column; }
+.sidebar.collapsed { width:70px; }
+.sidebar.collapsed .logo span,.sidebar.collapsed .sidebar-menu ul li a span,.sidebar.collapsed .user-info,.sidebar.collapsed .logout span { display:none; }
+
+.table-wrapper { overflow-x:auto; max-height:80vh; background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.05); }
+.organisme-table { width:100%; border-collapse:collapse; font-size:14px; }
+.organisme-table th,.organisme-table td { padding:13px 15px; border-bottom:1px solid #eee; text-align:left; white-space:nowrap; }
+.organisme-table th { background: #97c3a2; color:white; font-weight:600; }
 .organisme-table tbody tr:nth-child(even) { background:#f8f9fa; }
-.organisme-table tbody tr:hover { background:#e9ecef; cursor:pointer; }
-.organisme-table .action-btns a { margin-right:5px; padding:5px 10px; border-radius:4px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
-.organisme-table .action-btns .btn-warning { background:#ffc107; color:black; }
-.organisme-table .action-btns .btn-danger { background:#dc3545; color:white; }
+.organisme-table tbody tr:hover { background:#e9f0ff; }
+.organisme-table .action-btns a { margin-right:5px; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; transition:all .2s; }
+.organisme-table .action-btns .btn-warning { background:#ffc107; color:#000; }
+.organisme-table .action-btns .btn-danger  { background:#dc3545; color:#fff; }
+.organisme-table .action-btns a:hover { transform:translateY(-2px); opacity:.9; }
+
+/* ── modals identiques à evenement ── */
+.stats-modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:2400; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+.stats-modal { width:min(920px,95vw); background:linear-gradient(140deg,#f8fffc,#ecfeff); border-radius:18px; border:1px solid #c6f6d5; box-shadow:0 20px 45px rgba(15,118,110,.18); overflow:hidden; }
+.stats-header { color:#fff; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; }
+.stats-header h3 { margin:0; font-size:1.1rem; display:flex; align-items:center; gap:8px; }
+.close-modal-btn { background:transparent; border:none; color:#fff; font-size:1.5rem; cursor:pointer; line-height:1; }
+.stats-body { padding:20px; display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:18px; align-items:start; }
+.stats-chart-wrap { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:14px; }
+.stats-chart-title { margin:0 0 8px; font-size:.95rem; font-weight:600; }
+.stats-highlight-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px; }
+.stats-label { margin:0 0 8px; font-weight:600; font-size:.88rem; text-transform:uppercase; letter-spacing:.03em; }
+.stats-highlight-card h4 { margin:0 0 10px; font-size:1.2rem; line-height:1.3; color:#1e293b; }
+.stats-value { margin:0 0 10px; font-weight:700; font-size:1.1rem; }
+.stats-meta  { margin:4px 0; color:#334155; font-size:.92rem; }
+
+@media(max-width:860px) {
+    .stats-body { grid-template-columns:1fr; }
+}
 </style>
+
+
+{# ════════════════════════════════════════════ GOOGLE CHARTS ════ #}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+
+/* ── Charger le package corechart de Google Charts ── */
+google.charts.load('current', { packages: ['corechart'] });
+
+/* ── Données injectées par Twig (aucun appel API nécessaire) ── */
+const rawOrganismes = [
+    {% for o in organismes %}
+    {
+        nom:   {{ o.nom|json_encode|raw }},
+        type:  {{ o.type|json_encode|raw }},
+        ville: {{ o.ville|json_encode|raw }},
+        frais: {{ o.fraisMin ?? 0 }}
+    }{{ loop.last ? '' : ',' }}
+    {% endfor %}
+];
+
+/* ── Fermeture générique des modals ── */
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById(btn.dataset.modal).style.display = 'none';
+    });
+});
+window.addEventListener('click', e => {
+    document.querySelectorAll('.stats-modal-backdrop').forEach(b => {
+        if (e.target === b) b.style.display = 'none';
+    });
+});
+
+/* ── Sidebar toggle ── */
+(function() {
+    const toggle  = document.querySelector('.sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const main    = document.querySelector('.main-content');
+    if (!toggle || sidebar.getAttribute('data-sb-init')) return;
+    sidebar.setAttribute('data-sb-init','1');
+    toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        main.classList.toggle('expanded');
+    });
+})();
+
+
+/* ══════════════════════════════════════════════════
+   MODAL 1 — Répartition par TYPE → Google PieChart
+══════════════════════════════════════════════════ */
+(function() {
+    const btn   = document.getElementById('btn-type-stats');
+    const modal = document.getElementById('typeStatsModal');
+    if (!btn) return;
+    if (btn.getAttribute('data-type-init')) return;
+    btn.setAttribute('data-type-init', '1');
+
+    let chartDrawn = false;
+
+    function draw() {
+        /* Agréger par type */
+        const counts = {};
+        rawOrganismes.forEach(o => {
+            const k = o.type || 'Non défini';
+            counts[k] = (counts[k] || 0) + 1;
+        });
+        const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+        const top = entries[0] || ['—', 0];
+
+        /* Highlight card */
+        document.getElementById('top-type-name').textContent       = top[0];
+        document.getElementById('top-type-value').textContent       = top[1] + ' organisme(s)';
+        document.getElementById('type-total-organismes').textContent = rawOrganismes.length + ' organisme(s) au total';
+        document.getElementById('type-nb-types').textContent        = entries.length + ' type(s) différent(s)';
+
+        /* Google DataTable */
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'Type');
+        data.addColumn('number', 'Nombre');
+        entries.forEach(([label, val]) => data.addRow([label, val]));
+
+        /* Google PieChart avec pieHole = donut */
+        const chart = new google.visualization.PieChart(
+            document.getElementById('gc-type-chart')
+        );
+        chart.draw(data, {
+            pieHole: 0.38,
+            backgroundColor: 'transparent',
+            legend: { position: 'labeled', labeledValueText: 'both' },
+            pieSliceText: 'percentage',
+            chartArea: { width: '85%', height: '88%' },
+            colors: ['#8b5cf6','#a78bfa','#6d28d9','#c4b5fd','#7c3aed','#ddd6fe','#5b21b6','#ede9fe','#4c1d95','#f5f3ff'],
+            tooltip: { showColorCode: true }
+        });
+        chartDrawn = true;
+    }
+
+    btn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        /* google.charts.setOnLoadCallback garantit que la lib est prête */
+        if (typeof google.visualization !== 'undefined') {
+            if (!chartDrawn) draw();
+        } else {
+            google.charts.setOnLoadCallback(draw);
+        }
+    });
+})();
+
+
+/* ══════════════════════════════════════════════════
+   MODAL 2 — Répartition par VILLE → Google PieChart
+══════════════════════════════════════════════════ */
+(function() {
+    const btn   = document.getElementById('btn-ville-stats');
+    const modal = document.getElementById('villeStatsModal');
+    if (!btn) return;
+    if (btn.getAttribute('data-ville-init')) return;
+    btn.setAttribute('data-ville-init', '1');
+
+    let chartDrawn = false;
+
+    function draw() {
+        const counts = {};
+        rawOrganismes.forEach(o => {
+            const k = o.ville || 'Non défini';
+            counts[k] = (counts[k] || 0) + 1;
+        });
+        const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+        const top = entries[0] || ['—', 0];
+
+        document.getElementById('top-ville-name').textContent        = top[0];
+        document.getElementById('top-ville-value').textContent        = top[1] + ' organisme(s)';
+        document.getElementById('ville-total-organismes').textContent = rawOrganismes.length + ' organisme(s) au total';
+        document.getElementById('ville-nb-villes').textContent        = entries.length + ' ville(s) différente(s)';
+
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'Ville');
+        data.addColumn('number', 'Nombre');
+        entries.forEach(([label, val]) => data.addRow([label, val]));
+
+        const chart = new google.visualization.PieChart(
+            document.getElementById('gc-ville-chart')
+        );
+        chart.draw(data, {
+            pieHole: 0.38,
+            backgroundColor: 'transparent',
+            legend: { position: 'labeled', labeledValueText: 'both' },
+            pieSliceText: 'percentage',
+            chartArea: { width: '85%', height: '88%' },
+            colors: ['#0d9488','#14b8a6','#0f766e','#5eead4','#0e7490','#67e8f9','#155e75','#a5f3fc','#134e4a','#ccfbf1'],
+            tooltip: { showColorCode: true }
+        });
+        chartDrawn = true;
+    }
+
+    btn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        if (typeof google.visualization !== 'undefined') {
+            if (!chartDrawn) draw();
+        } else {
+            google.charts.setOnLoadCallback(draw);
+        }
+    });
+})();
+
+
+/* ══════════════════════════════════════════════════
+   MODAL 3 — Frais Min par organisme → Google BarChart
+══════════════════════════════════════════════════ */
+(function() {
+    const btn   = document.getElementById('btn-frais-stats');
+    const modal = document.getElementById('fraisStatsModal');
+    if (!btn) return;
+    if (btn.getAttribute('data-frais-init')) return;
+    btn.setAttribute('data-frais-init', '1');
+
+    let chartDrawn = false;
+
+    function draw() {
+        const withFrais = rawOrganismes
+            .filter(o => Number(o.frais) > 0)
+            .sort((a,b) => b.frais - a.frais);
+
+        const top     = withFrais[0] || null;
+        const moyenne = withFrais.length > 0
+            ? (withFrais.reduce((s,o) => s + Number(o.frais), 0) / withFrais.length).toFixed(2)
+            : 0;
+
+        document.getElementById('top-frais-name').textContent        = top ? top.nom : '—';
+        document.getElementById('top-frais-value').textContent        = top ? top.frais + ' €' : '— €';
+        document.getElementById('frais-total-organismes').textContent = withFrais.length + ' organisme(s) avec frais';
+        document.getElementById('frais-moyenne').textContent          = 'Moyenne : ' + moyenne + ' €';
+
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'Organisme');
+        data.addColumn('number', 'Frais Min (€)');
+
+        if (withFrais.length > 0) {
+            withFrais.forEach(o => {
+                const label = o.nom.length > 22 ? o.nom.slice(0,22)+'…' : o.nom;
+                data.addRow([label, Number(o.frais)]);
+            });
+        } else {
+            data.addRow(['Aucune donnée', 0]);
+        }
+
+        /* BarChart horizontal = lisible avec de nombreux organismes */
+        const chart = new google.visualization.BarChart(
+            document.getElementById('gc-frais-chart')
+        );
+        chart.draw(data, {
+            backgroundColor: 'transparent',
+            legend: { position: 'none' },
+            hAxis: { title: 'Frais Min (€)', textStyle: { fontSize: 11 }, minValue: 0 },
+            vAxis: { textStyle: { fontSize: 11 } },
+            chartArea: { width: '62%', height: '84%' },
+            colors: ['#b45309'],
+            bar: { groupWidth: '62%' },
+            tooltip: { showColorCode: true }
+        });
+        chartDrawn = true;
+    }
+
+    btn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        if (typeof google.visualization !== 'undefined') {
+            if (!chartDrawn) draw();
+        } else {
+            google.charts.setOnLoadCallback(draw);
+        }
+    });
+})();
+
+</script>
 {% endblock %}

@@ -10,94 +10,93 @@
 
 {% block body %}
 <aside class="sidebar">
-      <div class="sidebar-header">
+    <div class="sidebar-header">
         <div class="logo">
-          <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="nav-logo">
-          <span>LearnFlex</span><span class="highlight">+</span>
+            <img src="{{ asset('assets/images/logo1.png') }}" alt="Learnflex+ Logo" class="nav-logo">
+            <span>LearnFlex</span><span class="highlight">+</span>
         </div>
         <button class="sidebar-toggle">
-          <i class="fas fa-bars"></i>
+            <i class="fas fa-bars"></i>
         </button>
-      </div>
-      
-      <div class="sidebar-content">
+    </div>
+    
+    <div class="sidebar-content">
         <nav class="sidebar-menu">
-          <ul>
-            <li class="active">
-              <a href="#">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-users"></i>
-                <span>Utilisateurs</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-book-open"></i>
-                <span>contenu pédagogique</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Evaluation</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-question-circle"></i>
-                <span>Questionnaire</span>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i class="fas fa-directions"></i>
-                <span>Orientation</span>
-              </a>
-            </li>
-           
+            <ul>
+                 <li class="active">
+                          <a href="{{ path('dashboard') }}">
+                              <i class="fas fa-tachometer-alt"></i>
+                              <span>Dashboard</span>
+                          </a>
+                      </li>
+                
+                    <li class="active">
+                        <a href="{{ path('app_users') }}">
+                            <i class="fas fa-users"></i>
+                            <span>Utilisateurs</span>
+                        </a>
+                    </li>
+                
                 <li>
-                  <a href="{{ path('app_organisme_index') }}">
-
-                    <i class="fas fa-building"></i>
-                    <span>Organisme</span>
-                  </a>
+                    <a href="#">
+                        <i class="fas fa-book-open"></i>
+                        <span>contenu pédagogique</span>
+                    </a>
                 </li>
                 <li>
-                  <a href="{{ path('app_evenement_index') }}">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Événement</span>
-                  </a>
+                    <a href="#">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Evaluation</span>
+                    </a>
                 </li>
-              
-            <li>
-              <a href="#">
-                <i class="fas fa-comments"></i>
-                <span>Forum</span>
-              </a>
-            </li>
-          </ul>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Questionnaire</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-directions"></i>
+                        <span>Orientation</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('app_organisme_index') }}">
+                        <i class="fas fa-building"></i>
+                        <span>Organisme</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{{ path('app_evenement_index') }}">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Événement</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-comments"></i>
+                        <span>Forum</span>
+                    </a>
+                </li>
+            </ul>
         </nav>
-      </div>
-      
-      <div class="sidebar-footer">
+    </div>
+    
+    <div class="sidebar-footer">
         <a href="#" class="user-profile">
-          <img src="{{ asset('assets/images/placeholder-admin.png') }}" alt="Admin" class="user-img">
-          <div class="user-info">
-            <h4>Admin User</h4>
-            <p>Administrateur</p>
-          </div>
+            <img src="{{ asset('assets/images/placeholder-admin.png') }}" alt="Admin" class="user-img">
+            <div class="user-info">
+                <h4>Admin User</h4>
+                <p>Administrateur</p>
+            </div>
         </a>
         <a href="#" class="logout">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Déconnexion</span>
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Déconnexion</span>
         </a>
-      </div>
-    </aside>
+    </div>
+</aside>
 
 <div class="main-content">
     <div class="container mt-4 table-container">
@@ -107,6 +106,15 @@
             <a href="{{ path('app_evenement_new') }}" class="btn btn-sm btn-success">
                 <i class="fas fa-plus"></i> Ajouter un événement
             </a>
+            <button id="btn-capacity-stats" class="btn btn-sm" style="background:#0f766e; color:#fff; border:none; border-radius:4px; padding:6.5px 12px; font-weight:500;">
+                <i class="fas fa-chart-pie"></i> Statistiques capacite
+            </button>
+            <button id="btn-eventcount-stats" class="btn btn-sm" style="background:#0b5ed7; color:#fff; border:none; border-radius:4px; padding:6.5px 12px; font-weight:500;">
+                <i class="fas fa-chart-pie"></i> Stats creations
+            </button>
+            <button id="btn-recommendations" class="btn btn-sm" style="background: #1f4f65; color: white; border: none; border-radius: 4px; padding: 6.5px 12px; font-weight: 500;">
+                <i class="fas fa-globe"></i> Recommandations Mondiales
+            </button>
 
             <form method="get" action="{{ path('evenement_search') }}" style="display:flex; gap:8px; align-items:center;">
                 <input type="text" name="query" value="{{ app.request.get('query') }}" placeholder="Rechercher par titre..." style="padding:8px 10px; border:1px solid #ccc; border-radius:4px;">
@@ -114,23 +122,15 @@
             </form>
 
             <div class="sort-controls" style="display:flex; gap:8px; align-items:center;">
-    <span style="font-weight:500; color:#333;">Trier par capacité</span>
-    
-    <a href="{{ path('evenement_sort_capacite', {'direction':'ASC'}) }}" 
-       class="btn btn-sm" 
-       title="Trier par capacité ascendant"
-       style="background:#eef; border:1px solid #bbd;">
-        <i class="fas fa-sort-amount-down"></i>
-    </a>
-
-    <a href="{{ path('evenement_sort_capacite', {'direction':'DESC'}) }}" 
-       class="btn btn-sm" 
-       title="Trier par capacité descendant"
-       style="background:#fee; border:1px solid #dba;">
-        <i class="fas fa-sort-amount-up"></i>
-    </a>
-</div>
-
+                <span style="font-weight:500; color:#333;">Trier par capacité</span>
+                <a href="{{ path('evenement_sort_capacite', {'direction':'ASC'}) }}" class="btn btn-sm" title="Trier par capacité ascendant" style="background:#eef; border:1px solid #bbd;">
+                    <i class="fas fa-sort-amount-down"></i>
+                </a>
+                
+                <a href="{{ path('evenement_sort_capacite', {'direction':'DESC'}) }}" class="btn btn-sm" title="Trier par capacité descendant" style="background:#fee; border:1px solid #dba;">
+                    <i class="fas fa-sort-amount-up"></i>
+                </a>
+            </div>
         </div>
 
         <div class="table-wrapper">
@@ -147,9 +147,6 @@
                         <th>Capacité Max</th>
                         <th>Public Cible</th>
                         <th>Organisme</th>
-                        <th>Contact Email</th>
-                        <th>Contact Téléphone</th>
-                        <th>Lien Inscription</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -158,7 +155,7 @@
                     <tr>
                         <td>{{ evenement.id }}</td>
                         <td>{{ evenement.titre }}</td>
-                        <td>{{ evenement.description }}</td>
+                        <td>{{ evenement.description|slice(0, 50) ~ '...' }}</td>
                         <td>{{ evenement.datedebut ? evenement.datedebut|date('d/m/Y H:i') : '-' }}</td>
                         <td>{{ evenement.datefin ? evenement.datefin|date('d/m/Y H:i') : '-' }}</td>
                         <td>{{ evenement.lieu }}</td>
@@ -166,73 +163,678 @@
                         <td>{{ evenement.capacitemax }}</td>
                         <td>{{ evenement.publiccible }}</td>
                         <td>{{ evenement.organisme ? evenement.organisme.nom : '-' }}</td>
-                        <td>{{ evenement.contactemail }}</td>
-                        <td>{{ evenement.contacttelephone }}</td>
-                        <td>
-                            {% if evenement.lieninscription %}
-                                <a href="{{ evenement.lieninscription }}" target="_blank">{{ evenement.lieninscription }}</a>
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
                         <td class="action-btns">
-    <a href="{{ path('app_evenement_edit', { 'id': evenement.id }) }}"
-       class="btn btn-sm btn-warning"
-       title="Modifier"
-       style="margin-right:5px;">
-        <i class="fas fa-edit"></i>
-    </a>
-
-    <a href="{{ path('app_evenement_delete', { 'id': evenement.id }) }}"
-       class="btn btn-sm btn-danger"
-       title="Supprimer"
-       onclick="return confirm('Voulez-vous vraiment supprimer cet événement ?');">
-        <i class="fas fa-trash"></i>
-    </a>
-</td>
-
+                            <a href="{{ path('app_evenement_edit', { 'id': evenement.id }) }}" class="btn btn-sm btn-warning" title="Modifier" style="margin-right:5px;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-sm btn-info btn-share" data-id="{{ evenement.id }}" data-title="{{ evenement.titre }}" title="Partager" style="background:#0dcaf0; color:white; border:none; margin-right:5px; padding:8px 12px; border-radius:6px;">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <a href="{{ path('app_evenement_delete', { 'id': evenement.id }) }}" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer cet événement ?');">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="14" class="text-center text-muted">Aucun événement trouvé</td>
+                        <td colspan="11" class="text-center text-muted">Aucun événement trouvé</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <div class="container mt-5">
+        <hr>
+        <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid rgba(151, 195, 162, 0.2);">
+            <h2 style="color: #1a1a2e; margin-bottom: 25px; font-weight: 700; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-calendar-alt" style="color: #97c3a2;"></i> Calendrier des événements
+            </h2>
+            {% include 'evenement/calendar.html.twig' with {
+                'events_url': path('app_events_calendar_data'),
+                'is_editable': true,
+                'primary_color': '#97c3a2',
+                'secondary_color': '#1f4f65',
+                'accent_color': '#fdba74'
+            } %}
+        </div>
+    </div>
+
+    <!-- Recommendations Modal -->
+    <div id="recommendationsModal" class="recommendations-modal-backdrop" style="display:none;">
+        <div class="recommendations-modal">
+            <div class="recommendations-header">
+                <h3><i class="fas fa-globe"></i> Événements Mondiaux</h3>
+                <button class="close-recommendations">&times;</button>
+            </div>
+            <div id="recommendations-content" class="recommendations-body">
+                <!-- Data will be loaded here -->
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Recherche des meilleurs événements...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Capacity Stats Modal -->
+    <div id="capacityStatsModal" class="stats-modal-backdrop" style="display:none;">
+        <div class="stats-modal">
+            <div class="stats-header">
+                <h3><i class="fas fa-chart-pie"></i> Statistiques de capacite</h3>
+                <button class="close-stats">&times;</button>
+            </div>
+            <div class="stats-body">
+                <div class="stats-chart-wrap">
+                    <p class="stats-chart-title">Capacite max par evenement</p>
+                    <canvas id="capacityPieChart"></canvas>
+                </div>
+                <div class="stats-highlight-card">
+                    <p class="stats-label">Evenement avec la plus grande capacite</p>
+                    <h4 id="max-capacity-event-name">-</h4>
+                    <p id="max-capacity-event-value" class="stats-value">- places</p>
+                    <p id="stats-total-events" class="stats-meta">0 evenement</p>
+                    <p id="stats-total-capacity" class="stats-meta">Capacite totale: 0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Count Stats Modal -->
+    <div id="eventCountStatsModal" class="stats-modal-backdrop" style="display:none;">
+        <div class="stats-modal">
+            <div class="stats-header" style="background:#0b5ed7;">
+                <h3><i class="fas fa-chart-pie"></i> Statistiques creations</h3>
+                <button class="close-count-stats">&times;</button>
+            </div>
+            <div class="stats-body">
+                <div class="stats-chart-wrap">
+                    <p class="stats-chart-title">Nombre d'evenements crees (1 evenement = 1 slice)</p>
+                    <canvas id="eventCountPieChart"></canvas>
+                </div>
+                <div class="stats-highlight-card">
+                    <p class="stats-label">Resume creations</p>
+                    <h4 id="count-stats-main-title">Evenements crees</h4>
+                    <p id="count-stats-total-events" class="stats-value">0 evenement</p>
+                    <p class="stats-meta">Chaque slice represente 1 evenement</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="share-modal-backdrop" style="display:none;">
+        <div class="share-modal">
+            <div class="share-header">
+                <h3><i class="fas fa-share-alt"></i> Partager l'événement</h3>
+                <button class="close-share">&times;</button>
+            </div>
+            <div class="share-body">
+                <div id="ngrok-warning" class="share-alert" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ngrok n'est pas détecté. Lancez-le pour générer un lien public.</p>
+                </div>
+                
+                <div class="share-url-container">
+                    <input type="text" id="share-url-input" placeholder="Lien de l'événement...">
+                    <button id="btn-copy-url" class="btn btn-sm btn-primary" title="Copier"><i class="fas fa-copy"></i></button>
+                    <button id="btn-edit-url" class="btn btn-sm" title="Modifier le tunnel" style="background:#6c757d; color:white; border:none; border-radius:8px; padding:0 12px;"><i class="fas fa-edit"></i></button>
+                </div>
+
+                <div class="share-options">
+                    <button id="share-x" class="social-btn x-btn">
+                        <i class="fab fa-x-twitter"></i> Partager sur X
+                    </button>
+                    <button id="share-linkedin" class="social-btn linkedin-btn">
+                        <i class="fab fa-linkedin-in"></i> Partager sur LinkedIn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
-body { display:flex; margin:0; font-family:Arial, sans-serif; }
-.main-content { margin-left:250px; flex:1; padding:20px; background:#fff; }
-.table-wrapper { overflow-x:auto; max-height:80vh; }
+body { display:flex; margin:0; font-family: 'Poppins', sans-serif; background: #f4f7fe; min-height: 100vh; }
+.main-content { margin-left:260px; flex:1; padding:30px; background: #f4f7fe; min-width: 0; transition: all 0.3s ease; }
+.main-content.expanded { margin-left: 70px; }
+.container { max-width: 1300px; margin: 0 auto; width: 100%; }
+.table-wrapper { overflow-x:auto; max-height:80vh; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
 .evenement-table { width:100%; border-collapse:collapse; font-size:14px; }
-.evenement-table th, .evenement-table td { padding:12px; border-bottom:1px solid #ddd; text-align:left; white-space:nowrap; }
-.evenement-table th { background:#007bff; color:white; font-weight:bold; }
-.evenement-table tbody tr:nth-child(even) { background:#f8f9fa; }
-.evenement-table tbody tr:hover { background:#e9ecef; }
-.evenement-table .btn-warning { background:#ffc107; color:black; padding:5px 10px; border-radius:4px; text-decoration:none; }
-.evenement-table .btn-danger { background:#dc3545; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; }
-.evenement-table .action-btns a {
-    margin-right: 5px;
-    padding: 5px 10px;
-    border-radius: 4px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
+.evenement-table th, .evenement-table td { padding:15px; border-bottom:1px solid #eee; text-align:left; white-space:nowrap; }
+.evenement-table th { background: #97c3a2; color:white; font-weight:600; }
+.evenement-table tbody tr:hover { background:#f9fbfd; cursor:pointer; }
+.evenement-table .action-btns a { margin-right:5px; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; transition: all 0.2s; }
+.evenement-table .action-btns .btn-warning { background:#ffc107; color:black; }
+.evenement-table .action-btns .btn-danger { background:#dc3545; color:white; }
+.evenement-table .action-btns a:hover { transform: translateY(-2px); opacity: 0.9; }
 
-.evenement-table .action-btns .btn-warning {
-    background: #ffc107;
-    color: black;
-}
+/* Sidebar adjustments if not fully captured by dashboard.css */
+.sidebar { width: 260px; flex-shrink: 0; background-color: #1f4f65; height: 100vh; position: fixed; top: 0; left: 0; transition: all 0.3s ease; z-index: 1000; color: white; display: flex; flex-direction: column; }
+.sidebar.collapsed { width: 70px; }
+.sidebar.collapsed .logo span, .sidebar.collapsed .sidebar-menu ul li a span, .sidebar.collapsed .user-info, .sidebar.collapsed .logout span { display: none; }
 
-.evenement-table .action-btns .btn-danger {
-    background: #dc3545;
-    color: white;
-}
+/* Recommendations Modal Styles */
+.recommendations-modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.recommendations-modal { background: #fff; width: 90%; max-width: 800px; height: 80vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+.recommendations-header { padding: 20px 25px; background: #1f4f65; color: white; display: flex; justify-content: space-between; align-items: center; }
+.recommendations-header h3 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+.close-recommendations { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
+.close-recommendations:hover { opacity: 1; }
+.recommendations-body { flex: 1; overflow-y: auto; padding: 25px; background: #f8fafc; }
+.loading-state { text-align: center; padding: 50px; color: #64748b; }
+.loading-state i { font-size: 2.5rem; margin-bottom: 15px; color: #97c3a2; }
+.rec-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s; }
+.rec-card:hover { transform: translateX(5px); border-color: #97c3a2; }
+.rec-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin: 0; }
+.rec-meta { display: flex; gap: 15px; font-size: 0.85rem; color: #64748b; flex-wrap: wrap; }
+.rec-meta span { display: flex; align-items: center; gap: 6px; }
+.rec-meta i { color: #97c3a2; }
+.rec-desc { font-size: 0.9rem; color: #475569; line-height: 1.5; margin: 5px 0 0; }
+.rec-category { display: inline-block; padding: 4px 10px; background: #f1f5f9; border-radius: 6px; color: #475569; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; align-self: flex-start; }
 
+/* Capacity Stats Modal */
+.stats-modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 2400; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.stats-modal { width: min(900px, 94vw); background: linear-gradient(140deg, #f8fffc 0%, #ecfeff 100%); border-radius: 18px; border: 1px solid #c6f6d5; box-shadow: 0 20px 45px rgba(15, 118, 110, 0.2); overflow: hidden; }
+.stats-header { background: #0f766e; color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+.stats-header h3 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+.close-stats { background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+.close-count-stats { background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+.stats-body { padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: center; }
+.stats-chart-wrap { background: #fff; border: 1px solid #d1fae5; border-radius: 14px; padding: 14px; min-height: 320px; }
+.stats-chart-wrap canvas { width: 100% !important; height: 100% !important; min-height: 280px; }
+.stats-chart-title { margin: 0 0 8px; font-size: 0.95rem; font-weight: 600; color: #0f766e; }
+.stats-highlight-card { background: #ffffff; border: 1px solid #d1fae5; border-radius: 14px; padding: 18px; box-shadow: inset 0 0 0 1px #f0fdfa; }
+.stats-label { margin: 0 0 8px; color: #0f766e; font-weight: 600; font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.stats-highlight-card h4 { margin: 0 0 10px; color: #134e4a; font-size: 1.2rem; line-height: 1.3; }
+.stats-value { margin: 0 0 10px; color: #065f46; font-weight: 700; font-size: 1.1rem; }
+.stats-meta { margin: 4px 0; color: #334155; font-size: 0.92rem; }
+
+/* Share Modal Styles */
+.share-modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2500; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.share-modal { background: #fff; width: 400px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+.share-header { padding: 15px 20px; background: #1f4f65; color: white; display: flex; justify-content: space-between; align-items: center; }
+.share-header h3 { margin: 0; font-size: 1.1rem; }
+.close-share { background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer; }
+.share-body { padding: 20px; }
+.share-url-container { display: flex; gap: 10px; margin-bottom: 20px; }
+.share-url-container input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; background: #f9f9f9; }
+.share-options { display: flex; flex-direction: column; gap: 12px; }
+.social-btn { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: opacity 0.2s; }
+.x-btn { background: #000; }
+.linkedin-btn { background: #0077b5; }
+.social-btn:hover { opacity: 0.9; }
+.share-alert { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; font-size: 0.85rem; }
+@media (max-width: 900px) {
+    .stats-body { grid-template-columns: 1fr; }
+    .stats-chart-wrap { min-height: 260px; }
+    .stats-chart-wrap canvas { min-height: 220px; }
+}
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function() {
+    function truncateLabel(label, maxLen) {
+        if (!label) return '';
+        return label.length > maxLen ? `${label.slice(0, maxLen)}...` : label;
+    }
+
+    const sliceCalloutPlugin = {
+        id: 'sliceCalloutPlugin',
+        afterDatasetsDraw(chart) {
+            const datasetMeta = chart.getDatasetMeta(0);
+            const labels = chart.data.labels || [];
+            if (!datasetMeta || !datasetMeta.data || datasetMeta.data.length === 0) return;
+
+            const { ctx } = chart;
+            ctx.save();
+            ctx.font = '12px Poppins, sans-serif';
+            ctx.fillStyle = '#1f2937';
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+
+            datasetMeta.data.forEach((arc, index) => {
+                const label = labels[index];
+                if (!label) return;
+
+                const angle = (arc.startAngle + arc.endAngle) / 2;
+                const r = arc.outerRadius;
+                const cx = arc.x;
+                const cy = arc.y;
+
+                const p1x = cx + Math.cos(angle) * (r + 2);
+                const p1y = cy + Math.sin(angle) * (r + 2);
+                const p2x = cx + Math.cos(angle) * (r + 16);
+                const p2y = cy + Math.sin(angle) * (r + 16);
+
+                const goRight = Math.cos(angle) >= 0;
+                const p3x = p2x + (goRight ? 16 : -16);
+                const p3y = p2y;
+
+                ctx.beginPath();
+                ctx.moveTo(p1x, p1y);
+                ctx.lineTo(p2x, p2y);
+                ctx.lineTo(p3x, p3y);
+                ctx.stroke();
+
+                // tiny arrow head
+                ctx.beginPath();
+                if (goRight) {
+                    ctx.moveTo(p3x, p3y);
+                    ctx.lineTo(p3x - 4, p3y - 3);
+                    ctx.lineTo(p3x - 4, p3y + 3);
+                } else {
+                    ctx.moveTo(p3x, p3y);
+                    ctx.lineTo(p3x + 4, p3y - 3);
+                    ctx.lineTo(p3x + 4, p3y + 3);
+                }
+                ctx.closePath();
+                ctx.fillStyle = '#334155';
+                ctx.fill();
+
+                ctx.fillStyle = '#1f2937';
+                ctx.textAlign = goRight ? 'left' : 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, p3x + (goRight ? 6 : -6), p3y);
+            });
+
+            ctx.restore();
+        }
+    };
+
+    function initSidebar() {
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        if (!sidebarToggle || !sidebar || !mainContent) return;
+
+        // Prevent duplicate listeners
+        if (sidebarToggle.getAttribute('data-sidebar-initialized')) return;
+        sidebarToggle.setAttribute('data-sidebar-initialized', 'true');
+
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initSidebar);
+    document.addEventListener('turbo:load', initSidebar);
+
+    function initRecommendations() {
+        const btn = document.getElementById('btn-recommendations');
+        const modal = document.getElementById('recommendationsModal');
+        const closeBtn = document.querySelector('.close-recommendations');
+        const content = document.getElementById('recommendations-content');
+
+        if (!btn || !modal) return;
+
+        // Prevent duplicate listeners
+        if (btn.getAttribute('data-rec-initialized')) return;
+        btn.setAttribute('data-rec-initialized', 'true');
+
+        btn.addEventListener('click', async function() {
+            modal.style.display = 'flex';
+            content.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Recherche des meilleurs événements...</p></div>';
+
+            try {
+                const response = await fetch('{{ path("app_evenement_recommendations") }}');
+                const data = await response.json();
+
+                if (data.error) throw new Error(data.error);
+
+                if (data.length === 0) {
+                    content.innerHTML = '<div class="loading-state"><p>Aucune recommandation trouvée pour le moment.</p></div>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(event => {
+                    const date = new Date(event.start).toLocaleDateString('fr-FR', {
+                        day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    html += `
+                        <div class="rec-card">
+                            <span class="rec-category">${event.category || 'Événement'}</span>
+                            <h4 class="rec-title">${event.title}</h4>
+                            <div class="rec-meta">
+                                <span><i class="fas fa-calendar-alt"></i> ${date}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> ${event.location ? event.location.join(', ') : 'Lieu non spécifié'}</span>
+                                ${event.venue ? `<span><i class="fas fa-building"></i> ${event.venue.name}</span>` : ''}
+                            </div>
+                            ${event.description ? `<p class="rec-desc">${event.description.substring(0, 150)}...</p>` : ''}
+                        </div>
+                    `;
+                });
+                content.innerHTML = html;
+
+            } catch (error) {
+                content.innerHTML = `<div class="loading-state" style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i><p>Erreur: ${error.message}</p></div>`;
+            }
+        });
+
+        closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    }
+
+    document.addEventListener('DOMContentLoaded', initRecommendations);
+    document.addEventListener('turbo:load', initRecommendations);
+
+    function initCapacityStats() {
+        const btn = document.getElementById('btn-capacity-stats');
+        const modal = document.getElementById('capacityStatsModal');
+        const closeBtn = document.querySelector('.close-stats');
+        const titleEl = document.getElementById('max-capacity-event-name');
+        const valueEl = document.getElementById('max-capacity-event-value');
+        const totalEventsEl = document.getElementById('stats-total-events');
+        const totalCapacityEl = document.getElementById('stats-total-capacity');
+        const canvas = document.getElementById('capacityPieChart');
+
+        if (!btn || !modal || !canvas) return;
+
+        if (btn.getAttribute('data-stats-initialized')) return;
+        btn.setAttribute('data-stats-initialized', 'true');
+
+        const rawStats = [
+            {% for evenement in evenements %}
+            { title: {{ evenement.titre|json_encode|raw }}, capacity: {{ evenement.capacitemax ?? 0 }} }{{ loop.last ? '' : ',' }}
+            {% endfor %}
+        ];
+
+        let chartInstance = null;
+
+        function renderStats() {
+            const stats = rawStats.filter(item => Number(item.capacity) > 0);
+            const totalCapacity = stats.reduce((sum, item) => sum + Number(item.capacity), 0);
+            const maxEvent = stats.length > 0
+                ? stats.reduce((max, current) => Number(current.capacity) > Number(max.capacity) ? current : max, stats[0])
+                : null;
+
+            if (maxEvent) {
+                titleEl.textContent = maxEvent.title;
+                valueEl.textContent = `${maxEvent.capacity} places`;
+            } else {
+                titleEl.textContent = 'Aucune donnee disponible';
+                valueEl.textContent = '0 places';
+            }
+
+            totalEventsEl.textContent = `${rawStats.length} evenement(s)`;
+            totalCapacityEl.textContent = `Capacite totale: ${totalCapacity}`;
+
+            if (typeof Chart === 'undefined') return;
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const labels = stats.length > 0 ? stats.map(item => truncateLabel(item.title, 26)) : ['Aucune donnee'];
+            const values = stats.length > 0 ? stats.map(item => Number(item.capacity)) : [1];
+            const colors = labels.map((_, index) => `hsl(${(index * 57) % 360}, 70%, 58%)`);
+
+            chartInstance = new Chart(canvas, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 0
+                    }]
+                },
+                plugins: [sliceCalloutPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    events: [],
+                    layout: {
+                        padding: {
+                            top: 24,
+                            right: 38,
+                            bottom: 24,
+                            left: 38
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 14,
+                                padding: 14,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: false,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed || 0;
+                                    return `${context.label}: ${value} places`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        btn.addEventListener('click', function() {
+            modal.style.display = 'flex';
+            renderStats();
+        });
+
+        closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    }
+
+    document.addEventListener('DOMContentLoaded', initCapacityStats);
+    document.addEventListener('turbo:load', initCapacityStats);
+
+    function initEventCountStats() {
+        const btn = document.getElementById('btn-eventcount-stats');
+        const modal = document.getElementById('eventCountStatsModal');
+        const closeBtn = document.querySelector('.close-count-stats');
+        const totalEventsEl = document.getElementById('count-stats-total-events');
+        const canvas = document.getElementById('eventCountPieChart');
+
+        if (!btn || !modal || !closeBtn || !canvas) return;
+        if (btn.getAttribute('data-count-stats-initialized')) return;
+        btn.setAttribute('data-count-stats-initialized', 'true');
+
+        const rawStats = [
+            {% for evenement in evenements %}
+            { title: {{ evenement.titre|json_encode|raw }}, count: 1 }{{ loop.last ? '' : ',' }}
+            {% endfor %}
+        ];
+
+        let chartInstance = null;
+
+        function renderStats() {
+            totalEventsEl.textContent = `${rawStats.length} evenement(s)`;
+
+            if (typeof Chart === 'undefined') return;
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const labels = rawStats.length > 0 ? rawStats.map(item => truncateLabel(item.title, 26)) : ['Aucune donnee'];
+            const values = rawStats.length > 0 ? rawStats.map(() => 1) : [1];
+            const colors = labels.map((_, index) => `hsl(${(index * 57 + 30) % 360}, 65%, 60%)`);
+
+            chartInstance = new Chart(canvas, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 0
+                    }]
+                },
+                plugins: [sliceCalloutPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    events: [],
+                    layout: {
+                        padding: {
+                            top: 24,
+                            right: 38,
+                            bottom: 24,
+                            left: 38
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 14,
+                                padding: 14,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: 1 evenement`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        btn.addEventListener('click', function() {
+            modal.style.display = 'flex';
+            renderStats();
+        });
+
+        closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    }
+
+    document.addEventListener('DOMContentLoaded', initEventCountStats);
+    document.addEventListener('turbo:load', initEventCountStats);
+
+    function initSharing() {
+        const shareBtns = document.querySelectorAll('.btn-share');
+        const modal = document.getElementById('shareModal');
+        const closeBtn = document.querySelector('.close-share');
+        const urlInput = document.getElementById('share-url-input');
+        const copyBtn = document.getElementById('btn-copy-url');
+        const editBtn = document.getElementById('btn-edit-url');
+        const warning = document.getElementById('ngrok-warning');
+        const xBtn = document.getElementById('share-x');
+        const liBtn = document.getElementById('share-linkedin');
+
+        if (!modal) return;
+
+        let currentEvent = null;
+        let manualBaseUrl = localStorage.getItem('ngrok_base_url');
+
+        shareBtns.forEach(btn => {
+            if (btn.getAttribute('data-share-initialized')) return;
+            btn.setAttribute('data-share-initialized', 'true');
+
+            btn.addEventListener('click', async function() {
+                const id = this.getAttribute('data-id');
+                const title = this.getAttribute('data-title');
+                currentEvent = { id, title };
+
+                modal.style.display = 'flex';
+                urlInput.value = 'Chargement...';
+                urlInput.readOnly = true;
+                warning.style.display = 'none';
+
+                try {
+                    const response = await fetch('{{ path("app_evenement_ngrok_url") }}');
+                    const data = await response.json();
+
+                    if (data.url) {
+                        const publicUrl = `${data.url}/etudiant/evenement/${id}`;
+                        urlInput.value = publicUrl;
+                        localStorage.setItem('ngrok_base_url', data.url);
+                    } else if (manualBaseUrl) {
+                        urlInput.value = `${manualBaseUrl}/etudiant/evenement/${id}`;
+                    } else {
+                        urlInput.value = `${window.location.origin}/etudiant/evenement/${id}`;
+                        warning.style.display = 'flex';
+                    }
+                } catch (error) {
+                    if (manualBaseUrl) {
+                        urlInput.value = `${manualBaseUrl}/etudiant/evenement/${id}`;
+                    } else {
+                        urlInput.value = `${window.location.origin}/etudiant/evenement/${id}`;
+                        warning.style.display = 'flex';
+                    }
+                }
+            });
+        });
+
+        editBtn.addEventListener('click', () => {
+            urlInput.readOnly = !urlInput.readOnly;
+            if (!urlInput.readOnly) {
+                urlInput.focus();
+                alert('Vous pouvez maintenant modifier manuellement le lien public.');
+            } else {
+                // Try to extract base URL and save it
+                try {
+                    const url = new URL(urlInput.value);
+                    const baseUrl = url.origin;
+                    localStorage.setItem('ngrok_base_url', baseUrl);
+                    manualBaseUrl = baseUrl;
+                } catch (e) {}
+            }
+        });
+
+        urlInput.addEventListener('change', () => {
+            try {
+                const url = new URL(urlInput.value);
+                localStorage.setItem('ngrok_base_url', url.origin);
+                manualBaseUrl = url.origin;
+            } catch (e) {}
+        });
+
+        xBtn.addEventListener('click', () => {
+            if (!currentEvent) return;
+            const text = `Découvrez l'événement "${currentEvent.title}" sur LearnFlex+ !`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(urlInput.value)}`, '_blank');
+        });
+
+        liBtn.addEventListener('click', () => {
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(urlInput.value)}`, '_blank');
+        });
+
+        copyBtn.addEventListener('click', () => {
+            urlInput.select();
+            document.execCommand('copy');
+            const originalIcon = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => copyBtn.innerHTML = originalIcon, 2000);
+        });
+
+        closeBtn.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    }
+
+    document.addEventListener('DOMContentLoaded', initSharing);
+    document.addEventListener('turbo:load', initSharing);
+})();
+</script>
 {% endblock %}

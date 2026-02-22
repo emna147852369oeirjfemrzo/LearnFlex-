@@ -1,0 +1,23 @@
+[
+  {
+    "id": "E1",
+    "title": "Introduction to Python",
+    "date": "2026-03-10T18:00:00",
+    "description": "A live workshop covering Python basics for learners.",
+    "capacity": 50
+  },
+  {
+    "id": "E2",
+    "title": "Advanced Machine Learning",
+    "date": "2026-03-20T19:00:00",
+    "description": "Deep dive into modern ML techniques and practice labs.",
+    "capacity": 30
+  },
+  {
+    "id": "E3",
+    "title": "Course Design for Educators",
+    "date": "2026-04-05T17:00:00",
+    "description": "Hands-on session on building engaging e-learning courses.",
+    "capacity": 40
+  }
+]

@@ -34,5 +34,6 @@ security:
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/front, roles: PUBLIC_ACCESS }
+        
+        - { path: ^/etudiant, roles: PUBLIC_ACCESS } 
         - { path: ^/users, roles: ROLE_ADMIN }

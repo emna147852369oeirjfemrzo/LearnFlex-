@@ -10,6 +10,7 @@
 ###< symfony/framework-bundle ###
 
 
+
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
@@ -22,3 +23,5 @@
 
 /assets/vendor/
 ###< symfony/asset-mapper ###
+# API Keys & Environment
+.env
